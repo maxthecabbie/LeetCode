@@ -1,0 +1,455 @@
+"""
+369. Plus One Linked List
+
+Given a non-negative integer represented as non-empty a singly linked list of digits, plus one to the 
+integer.
+
+You may assume the integer do not contain any leading zero, except the number 0 itself.
+
+The digits are stored such that the most significant digit is at the head of the list.
+
+Example:
+Input:
+1->2->3
+
+Output:
+1->2->4
+
+Solution Explanation
+- To do this in place, iterate through the linked list and keep track of the last node in the list that has a
+value that is not 9
+- If non_nine None, that means all the nodes have a val of 9. We must add a new head with a val of 0, which 
+will later get 1 added to the val
+- Add 1 to the val of the non_nine node
+- Iterate through the linked list starting at non_nine.next setting the val of each encountered node to 0
+- Return the head
+"""
+
+class Solution(object):
+    def plusOne(self, head):
+        """
+        :type head: ListNode
+        :rtype: ListNode
+        """
+        cursor = head
+        non_nine = None
+        
+        while cursor:
+            if cursor.val != 9:
+                non_nine = cursor
+            cursor = cursor.next
+            
+        if non_nine is None:
+            new_head = ListNode(0)
+            new_head.next = head
+            head = new_head
+            non_nine = head
+            
+        non_nine.val += 1
+        cursor = non_nine.next
+        
+        while cursor:
+            cursor.val = 0
+            cursor = cursor.next
+            
+        return head
+        
+"""
+817. Linked List Components
+
+We are given head, the head node of a linked list containing unique integer values.
+
+We are also given the list G, a subset of the values in the linked list.
+
+Return the number of connected components in G, where two values are connected if they appear consecutively 
+in the linked list.
+
+Example 1:
+Input: 
+head: 0->1->2->3
+G = [0, 1, 3]
+Output: 2
+Explanation: 
+0 and 1 are connected, so [0, 1] and [3] are the two connected components.
+
+Example 2:
+Input: 
+head: 0->1->2->3->4
+G = [0, 3, 1, 4]
+Output: 2
+Explanation: 
+0 and 1 are connected, 3 and 4 are connected, so [0, 1] and [3, 4] are the two connected components.
+
+Note:
+If N is the length of the linked list given by head, 1 <= N <= 10000.
+The value of each node in the linked list will be in the range [0, N - 1].
+1 <= G.length <= 10000.
+G is a subset of all values in the linked list.
+
+Solution Explanation:
+- Create a set with all nodes from list G
+- Iterate through linked list and when you encounter a node with val in gset:
+    - Continue iterating while cursor is not None and the cursor.val is in gset
+    - Increment count by 1
+- Return count
+"""
+
+# Definition for singly-linked list.
+# class ListNode:
+#     def __init__(self, x):
+#         self.val = x
+#         self.next = None
+class Solution:
+    def numComponents(self, head, G):
+        """
+        :type head: ListNode
+        :type G: List[int]
+        :rtype: int
+        """
+        gset = set(G)
+        count = 0
+        cursor = head
+        
+        while cursor:
+            if cursor.val in gset:
+                while cursor and cursor.val in gset:
+                    cursor = cursor.next
+                count += 1
+            else:
+                cursor = cursor.next
+        
+        return count
+
+"""
+19. Remove Nth Node From End of List
+
+Given a linked list, remove the n-th node from the end of list and return its head.
+
+Example:
+Given linked list: 1->2->3->4->5, and n = 2.
+
+After removing the second node from the end, the linked list becomes 1->2->3->5.
+
+Note:
+Given n will always be valid.
+
+Follow up:
+Could you do this in one pass?
+"""
+
+# Definition for singly-linked list.
+# class ListNode:
+#     def __init__(self, x):
+#         self.val = x
+#         self.next = None
+class Solution:
+    def removeNthFromEnd(self, head, n):
+        """
+        :type head: ListNode
+        :type n: int
+        :rtype: ListNode
+        """
+
+        prev = head
+        cursor = head
+        size = 0
+        
+        while cursor:
+            cursor = cursor.next
+            size += 1
+        
+        cursor = head
+        
+        if n == size:
+            head = head.next
+            return head
+        
+        while n != size:
+            prev = cursor
+            cursor = cursor.next
+            size -= 1
+            
+        prev.next = cursor.next
+        return head
+
+"""
+328. Odd Even Linked List
+
+Given a singly linked list, group all odd nodes together followed by the even nodes. Please note here we are 
+talking about the node number and not the value in the nodes.
+
+You should try to do it in place. The program should run in O(1) space complexity and O(nodes) time 
+complexity.
+
+Example 1:
+Input: 1->2->3->4->5->NULL
+Output: 1->3->5->2->4->NULL
+
+Example 2:
+Input: 2->1->3->5->6->4->7->NULL
+Output: 2->3->6->7->1->5->4->NULL
+
+Note:
+The relative order inside both the even and odd groups should remain as it was in the input.
+The first node is considered odd, the second node even and so on ...
+"""
+
+# Definition for singly-linked list.
+# class ListNode:
+#     def __init__(self, x):
+#         self.val = x
+#         self.next = None
+class Solution:
+    def oddEvenList(self, head):
+        dummy_odd = odd = ListNode(0)
+        dummy_even = even = ListNode(0)
+        
+        while head:
+            odd.next = head
+            even.next = head.next
+            odd = odd.next
+            even = even.next
+            head = head.next.next if even else None
+            
+        odd.next = dummy_even.next
+        return dummy_odd.next
+
+"""
+148. Sort List
+
+Sort a linked list in O(n log n) time using constant space complexity.
+
+Example 1:
+Input: 4->2->1->3
+Output: 1->2->3->4
+
+Example 2:
+Input: -1->5->3->4->0
+Output: -1->0->3->4->5
+"""
+
+# Definition for singly-linked list.
+# class ListNode:
+#     def __init__(self, x):
+#         self.val = x
+#         self.next = None
+class Solution:
+    def sortList(self, head):
+        """
+        :type head: ListNode
+        :rtype: ListNode
+        """
+        if head is None or head.next is None:
+            return head
+        
+        fast = head
+        slow = head
+        prev = None
+        
+        while fast and fast.next:
+            prev = slow
+            slow = slow.next
+            fast = fast.next.next
+            
+        prev.next = None
+        
+        l = self.sortList(head)
+        r = self.sortList(slow)
+        return self.merge(l, r)
+    
+    def merge(self, l, r):
+        dummy = ListNode(0)
+        p = dummy
+        
+        while l and r:
+            if l.val <= r.val:
+                p.next = l
+                l = l.next
+            else:
+                p.next = r
+                r = r.next
+            p = p.next
+        
+        if l:
+            p.next = l
+        
+        elif r:
+            p.next = r
+        
+        return dummy.next
+
+"""
+2. Add Two Numbers
+
+You are given two non-empty linked lists representing two non-negative integers. The digits are stored in 
+reverse order and each of their nodes contain a single digit. Add the two numbers and return it as a linked 
+list.
+
+You may assume the two numbers do not contain any leading zero, except the number 0 itself.
+
+Example:
+Input: (2 -> 4 -> 3) + (5 -> 6 -> 4)
+Output: 7 -> 0 -> 8
+Explanation: 342 + 465 = 807.
+"""
+
+# Definition for singly-linked list.
+# class ListNode:
+#     def __init__(self, x):
+#         self.val = x
+#         self.next = None
+class Solution:
+    def addTwoNumbers(self, l1, l2):
+        """
+        :type l1: ListNode
+        :type l2: ListNode
+        :rtype: ListNode
+        """
+        c1 = l1
+        c2 = l2
+        carry = 0
+        dummy = ListNode(0)
+        cursor = dummy
+        
+        while c1 or c2 or carry > 0:
+            new_node = ListNode(0)
+            val = carry
+            
+            if c1:
+                val += c1.val
+                c1 = c1.next
+            if c2:
+                val += c2.val
+                c2 = c2.next
+            
+            if val > 9:
+                carry = 1
+                val = val % 10
+            else:
+                carry = 0
+        
+            new_node.val = val
+            cursor.next = new_node
+            cursor = new_node
+        
+        return dummy.next
+
+"""
+138. Copy List with Random Pointer
+
+A linked list is given such that each node contains an additional random pointer which could point to any 
+node in the list or null. Return a deep copy of the list.
+"""
+
+# Definition for singly-linked list with a random pointer.
+# class RandomListNode(object):
+#     def __init__(self, x):
+#         self.label = x
+#         self.next = None
+#         self.random = None
+class Solution(object):
+    def copyRandomList(self, head):
+        """
+        :type head: RandomListNode
+        :rtype: RandomListNode
+        """
+        if head is None:
+            return None
+        
+        nodes = {}
+        cursor = head
+        dummy_head = RandomListNode(0)
+        cpy_cursor = dummy_head
+        
+        while cursor:
+            cpy_node = nodes.get(cursor, RandomListNode(cursor.label))
+            cpy_node.random = None
+            
+            if cursor.random in nodes:
+                cpy_node.random = nodes[cursor.random]
+            elif cursor.random:
+                cpy_node.random = RandomListNode(cursor.random.label)
+                
+            nodes[cursor] = cpy_node
+            if cursor.random:
+                nodes[cursor.random] = cpy_node.random
+            
+            cpy_cursor.next = cpy_node
+            cpy_cursor = cpy_cursor.next
+            cursor = cursor.next
+        
+        return dummy_head.next
+
+# Alternative solution
+def copyRandomList(self, head):
+    d = {}
+    m = n = head
+    
+    while m:
+        d[m] = RandomListNode(m.label)
+        m = m.next
+        
+    while n:
+        d[n].next = d.get(n.next)
+        d[n].random = d.get(n.random)
+        n = n.next
+        
+    return d.get(head)
+
+"""
+708. Insert into a Cyclic Sorted List
+
+Given a node from a cyclic linked list which is sorted in ascending order, write a function to insert a 
+value into the list such that it remains a cyclic sorted list. The given node can be a reference to any 
+single node in the list, and may not be necessarily the smallest value in the cyclic list.
+
+If there are multiple suitable places for insertion, you may choose any place to insert the new value. After 
+the insertion, the cyclic list should remain sorted.
+
+If the list is empty (i.e., given node is null), you should create a new single cyclic list and return the 
+reference to that single node. Otherwise, you should return the original given node.
+
+The following example may help you understand the problem better:
+
+https://leetcode.com/problems/insert-into-a-cyclic-sorted-list/description/
+"""
+
+"""
+# Definition for a Node.
+class Node(object):
+    def __init__(self, val, next):
+        self.val = val
+        self.next = next
+"""
+class Solution(object):
+    def insert(self, head, insertVal):
+        """
+        :type head: Node
+        :type insertVal: int
+        :rtype: Node
+        """
+        if not head: 
+            new_node = Node(insertVal, None)
+            new_node.next = new_node
+            return new_node
+        
+        prev = head
+        cur = head.next
+        
+        while True:
+            if insertVal >= prev.val and insertVal <= cur.val:
+                break
+            elif prev.val > cur.val and (insertVal >= prev.val or\
+            insertVal <= cur.val):
+                break
+            elif cur == head: break
+            prev = prev.next
+            cur = cur.next
+        
+        new_node = Node(insertVal, cur)
+        prev.next = new_node
+        
+        return head
+    
+        
+        
