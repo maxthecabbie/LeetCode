@@ -42,28 +42,30 @@ we can go to
 - Return if length of the visited rooms is equal to the length of rooms
 """
 
+import queue
+
 class Solution:
     def canVisitAllRooms(self, rooms):
         """
         :type rooms: List[List[int]]
         :rtype: bool
         """
-        visited = {0}
-        q = Queue()
+        vis = {0}
+        q = queue.Queue()
         
         for key in rooms[0]:
-            q.enqueue(key)
-            visited.add(key)
+            vis.add(key)
+            q.put(key)
         
-        while not q.is_empty():
-            key = q.dequeue()
+        while not q.empty():
+            room = q.get()
             
-            for new_key in rooms[key]:
-                if new_key not in visited:
-                    visited.add(new_key)
-                    q.enqueue(new_key)
+            for key in rooms[room]:
+                if key not in vis:
+                    vis.add(key)
+                    q.put(key)
         
-        return len(visited) == len(rooms)
+        return len(rooms) == len(vis)
 
 """
 323. Number of Connected Components in an Undirected Graph
@@ -131,6 +133,75 @@ class Solution:
                 self.dfs(neighbor, graph, nodes)
 
 """
+756. Pyramid Transition Matrix
+
+We are stacking blocks to form a pyramid. Each block has a color which is a one letter string, like `'Z'`.
+
+For every block of color `C` we place not in the bottom row, we are placing it on top of a left block of 
+color `A` and right block of color `B`. We are allowed to place the block there only if `(A, B, C)` is an 
+allowed triple.
+
+We start with a bottom row of bottom, represented as a single string. We also start with a list of allowed 
+triples allowed. Each allowed triple is represented as a string of length 3.
+
+Return true if we can build the pyramid all the way to the top, otherwise false.
+
+Example 1:
+Input: bottom = "XYZ", allowed = ["XYD", "YZE", "DEA", "FFF"]
+Output: true
+Explanation:
+We can stack the pyramid like this:
+    A
+   / \
+  D   E
+ / \ / \
+X   Y   Z
+
+This works because ('X', 'Y', 'D'), ('Y', 'Z', 'E'), and ('D', 'E', 'A') are allowed triples.
+
+Example 2:
+Input: bottom = "XXYX", allowed = ["XXX", "XXY", "XYX", "XYY", "YXZ"]
+Output: false
+Explanation:
+We can't stack the pyramid to the top.
+Note that there could be allowed triples (A, B, C) and (A, B, D) with C != D.
+
+Note:
+bottom will be a string with length in range [2, 8].
+allowed will have length in range [0, 200].
+Letters in all strings will be chosen from the set {'A', 'B', 'C', 'D', 'E', 'F', 'G'}.
+"""
+
+class Solution:
+    def pyramidTransition(self, bottom, allowed):
+        """
+        :type bottom: str
+        :type allowed: List[str]
+        :rtype: bool
+        """
+        amap = {}
+        for a in allowed:
+            amap[a[:2]] = amap.get(a[:2], []).append(a[2])
+        return self.dfs(bottom, amap)
+        
+    def dfs(self, bot, amap):
+        if len(bot) == 2:
+            return bot in amap
+        
+        options = []
+        
+        for i in range(1, len(layer)):
+            if bot[i-1:i+1] in amap:
+                options.append(amap[bot[i-1:i+1]])
+            else:
+                return False
+        
+        for opt in options:
+            if self.dfs(layer, amap):
+                return True
+        return False
+
+"""
 286. Walls and Gates
 
 You are given a m x n 2D grid initialized with these three possible values.
@@ -170,29 +241,178 @@ have a bunch of 0 cells far away from a bunch of 1 cells. We'd then visit those 
 update their values from closer 0 cells.
 """
 
+import queue
+
 class Solution:
     def wallsAndGates(self, rooms):
         """
         :type rooms: List[List[int]]
         :rtype: void Do not return anything, modify rooms in-place instead.
         """
-        q = Queue()
+        q = queue.Queue()
         
         for i in range(len(rooms)):
             for j in range(len(rooms[0])):
                 if rooms[i][j] == 0:
-                    q.enqueue([i, j])
+                    q.put((i, j))
         
-        while not q.is_empty():
-            cell = q.dequeue()
+        while not q.empty():
+            cell = q.get()
             i, j = cell[0], cell[1]
-            dist = rooms[i][j]
             
             for r, c in ((i+1, j), (i-1, j), (i, j+1), (i, j-1)):
                 if 0 <= r < len(rooms) and 0 <= c < len(rooms[0]) \
-                and rooms[r][c] > dist + 1:
-                    rooms[r][c] = dist + 1
-                    q.enqueue([r, c])
+                and rooms[r][c] > rooms[i][j] + 1:
+                    rooms[r][c] = rooms[i][j] + 1
+                    q.put((r, c))
+                    
+"""
+490. The Maze
+
+There is a ball in a maze with empty spaces and walls. The ball can go through empty spaces by rolling up, 
+down, left or right, but it won't stop rolling until hitting a wall. When the ball stops, it could choose 
+the next direction.
+
+Given the ball's start position, the destination and the maze, determine whether the ball could stop at the 
+destination.
+
+The maze is represented by a binary 2D array. 1 means the wall and 0 means the empty space. You may assume 
+that the borders of the maze are all walls. The start and destination coordinates are represented by row and 
+column indexes.
+
+Example 1
+Input 1: a maze represented by a 2D array
+
+0 0 1 0 0
+0 0 0 0 0
+0 0 0 1 0
+1 1 0 1 1
+0 0 0 0 0
+
+Input 2: start coordinate (rowStart, colStart) = (0, 4)
+Input 3: destination coordinate (rowDest, colDest) = (4, 4)
+
+Output: true
+Explanation: One possible way is : left -> down -> left -> down -> right -> down -> right.
+
+Example 2
+Input 1: a maze represented by a 2D array
+
+0 0 1 0 0
+0 0 0 0 0
+0 0 0 1 0
+1 1 0 1 1
+0 0 0 0 0
+
+Input 2: start coordinate (rowStart, colStart) = (0, 4)
+Input 3: destination coordinate (rowDest, colDest) = (3, 2)
+
+Output: false
+Explanation: There is no way for the ball to stop at the destination.
+
+Note:
+There is only one ball and one destination in the maze.
+Both the ball and the destination exist on an empty space, and they will not be at the same position 
+initially.
+The given maze does not contain border (like the red rectangle in the example pictures), but you could 
+assume the border of the maze are all walls.
+The maze contains at least 2 empty spaces, and both the width and height of the maze won't exceed 100.
+
+https://leetcode.com/problems/the-maze/description/
+"""
+
+import queue
+
+class Solution:
+    def hasPath(self, maze, start, destination):
+        """
+        :type maze: List[List[int]]
+        :type start: List[int]
+        :type destination: List[int]
+        :rtype: bool
+        """
+        q = queue.Queue()
+        q.put(start)
+        vis = set()
+        dirs = [(-1, 0), (0, 1), (1, 0), (0, -1)]
+        
+        while not q.empty():
+            cell = q.get()
+            
+            for i in range(len(dirs)):
+                coord = self.traverse(cell, dirs[i], maze, vis, q)
+                if coord == destination:
+                    return True
+        return False
+    
+    def traverse(self, coord, d, mz, vis, q):
+        i, j = coord[0], coord[1]
+
+        while 0 <= i < len(mz) and 0 <= j < len(mz[0]) and mz[i][j] == 0:
+            i += d[0]
+            j += d[1]
+        
+        i, j = i-d[0], j-d[1]
+        key = str(i) + ":" + str(j)
+        
+        if key not in vis:
+            vis.add(key)
+            q.put((i, j))
+        return [i, j]
+
+"""
+399. Evaluate Division
+
+Equations are given in the format A / B = k, where A and B are variables represented as strings, and k is a 
+real number (floating point number). Given some queries, return the answers. If the answer does not exist, 
+return -1.0.
+
+Example:
+Given a / b = 2.0, b / c = 3.0. 
+queries are: a / c = ?, b / a = ?, a / e = ?, a / a = ?, x / x = ? . 
+return [6.0, 0.5, -1.0, 1.0, -1.0 ].
+
+The input is: vector<pair<string, string>> equations, vector<double>& values, vector<pair<string, string>> 
+queries , where equations.size() == values.size(), and the values are positive. This represents the 
+equations. Return vector<double>.
+
+According to the example above:
+equations = [ ["a", "b"], ["b", "c"] ],
+values = [2.0, 3.0],
+queries = [ ["a", "c"], ["b", "a"], ["a", "e"], ["a", "a"], ["x", "x"] ]. 
+The input is always valid. You may assume that evaluating the queries will result in no division by zero and 
+there is no contradiction.
+"""
+
+class Solution:
+    def calcEquation(self, equations, values, queries):
+        """
+        :type equations: List[List[str]]
+        :type values: List[float]
+        :type queries: List[List[str]]
+        :rtype: List[float]
+        """
+        g = {}
+        for (t, b), v in zip(equations, values):
+            g.setdefault(t, []).append((b, v))
+            g.setdefault(b, []).append((t, 1/v))
+        return [self.dfs(q[0], q[1], 1.0, g, set()) for q in queries]
+
+    def dfs(self, start, end, res, g, visited):
+        if start not in g or end not in g:
+            print(start, end)
+            return -1.0
+
+        if start == end:
+            return res
+
+        visited.add(start)
+        for node in g[start]:
+            if node[0] not in visited:
+                t = self.dfs(node[0], end, res * node[1], g, visited)
+                if t != -1.0:
+                    return t
+        return -1.0
 
 """
 200. Number of Islands
@@ -288,6 +508,8 @@ cells can reach the atlantic ocean
 cell to the result
 """
 
+import queue
+
 class Solution:
     def pacificAtlantic(self, matrix):
         """
@@ -297,40 +519,39 @@ class Solution:
         if len(matrix) <= 0:
             return []
         
-        result = []
-        pacific = [[False for j in range(len(matrix[0]))] for i in range(len(matrix))]
-        atlantic = [[False for j in range(len(matrix[0]))] for i in range(len(matrix))]
-        pq = Queue()
-        aq = Queue()
+        pac = [[False for _ in range(len(matrix[0]))] for _ in range(len(matrix))]
+        atl = [[False for _ in range(len(matrix[0]))] for _ in range(len(matrix))]
+        pac_q = queue.Queue()
+        atl_q = queue.Queue()
         
         for i in range(len(matrix)):
-            pq.enqueue([i, 0])
-            aq.enqueue([i, len(matrix[0]) - 1])
+            pac_q.put((i, 0))
+            atl_q.put((i, len(matrix[0]) - 1))
         
         for j in range(len(matrix[0])):
-            pq.enqueue([0, j])
-            aq.enqueue([len(matrix) - 1, j])
+            pac_q.put((0, j))
+            atl_q.put((len(matrix) - 1, j))
         
-        self.bfs(pq, matrix, pacific)
-        self.bfs(aq, matrix, atlantic)
-
+        self.bfs(pac_q, matrix, pac)
+        self.bfs(atl_q, matrix, atl)
+        
+        res = []
         for i in range(len(matrix)):
             for j in range(len(matrix[0])):
-                if pacific[i][j] and atlantic[i][j]:
-                    result.append([i, j])
-        return result
+                if pac[i][j] and atl[i][j]:
+                    res.append([i, j])
+        return res
     
     def bfs(self, q, matrix, ocean):
-        while not q.is_empty():
-            cell = q.dequeue()
+        while not q.empty():
+            cell = q.get()
             i, j = cell[0], cell[1]
-            h = matrix[i][j]
             ocean[i][j] = True
             
             for r, c in ((i+1, j), (i-1, j), (i, j+1), (i, j-1)):
                 if 0 <= r < len(matrix) and 0 <= c < len(matrix[0]) \
-                and matrix[r][c] >= h and not ocean[r][c]:
-                    q.enqueue([r, c]) 
+                and matrix[r][c] >= matrix[i][j] and not ocean[r][c]:
+                    q.put((r, c))
             
 """
 542. 01 Matrix
@@ -367,30 +588,32 @@ There are at least one 0 in the given matrix.
 The cells are adjacent in only four directions: up, down, left and right.
 """
 
+import queue
+
 class Solution:
     def updateMatrix(self, matrix):
         """
         :type matrix: List[List[int]]
         :rtype: List[List[int]]
         """
-        q = []
-        m, n = len(matrix), len(matrix[0])
+        q = queue.Queue()
         
-        result = [[0 for j in range(n)] for i in range(m)]
-        for i in range(m):
-            for j in range(n):
+        for i in range(len(matrix)):
+            for j in range(len(matrix[0])):
                 if matrix[i][j] == 0:
-                    q.append([i, j])
+                    q.put((i, j))
                 else:
                     matrix[i][j] = sys.maxsize
         
-        for cell in q:
+        while not q.empty():
+            cell = q.get()
             i, j = cell[0], cell[1]
+            
             for r, c in ((i+1, j), (i-1, j), (i, j+1), (i, j-1)):
-                val = matrix[i][j] + 1
-                if 0 <= r < m and 0 <= c < n and val < matrix[r][c]:
-                    matrix[r][c] = val
-                    q.append([r, c])
+                if 0 <= r < len(matrix) and 0 <= c < len(matrix[0]) \
+                and matrix[i][j] + 1 < matrix[r][c]:
+                    matrix[r][c] = matrix[i][j] + 1
+                    q.put((r, c))
         
         return matrix
 

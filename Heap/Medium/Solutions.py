@@ -27,23 +27,25 @@ class Solution:
         :rtype: int
         """
         heap = []
-        for j in range(len(matrix[0])):
-            heapq.heappush(heap, [matrix[0][j], 0, j])
         
-        for i in range(k-1):
-            t = heapq.heappop(heap)
-            x, y = t[1], t[2]
+        for j in range(len(matrix[0])):
+            heapq.heappush(heap, (matrix[0][j], 0, j))
+        
+        for _ in range(k-1):
+            cell = heapq.heappop(heap)
+            x, y = cell[1], cell[2]
             
-            if t[1] == len(matrix) - 1:
+            if x == len(matrix) - 1:
                 continue
-            heapq.heappush(heap, [matrix[x+1][y], x+1, y])
-            
+            heapq.heappush(heap, (matrix[x+1][y], x+1, y))
+        
         return heapq.heappop(heap)[0]
 
 """
 215. Kth Largest Element in an Array
 
-Find the kth largest element in an unsorted array. Note that it is the kth largest element in the sorted order, not the kth distinct element.
+Find the kth largest element in an unsorted array. Note that it is the kth largest element in the sorted 
+order, not the kth distinct element.
 
 Example 1:
 Input: [3,2,1,5,6,4] and k = 2
@@ -57,16 +59,21 @@ Note:
 You may assume k is always valid, 1 ≤ k ≤ array's length.
 """
 
-def findKthLargest4(self, nums, k):
-    heap = []
-    
-    for num in nums:
-        heapq.heappush(heap, num)
+class Solution:
+    def findKthLargest(self, nums, k):
+        """
+        :type nums: List[int]
+        :type k: int
+        :rtype: int
+        """
+        heap = []
+        for n in nums:
+            heapq.heappush(heap, n)
         
-    for _ in xrange(len(nums) - k):
-        heapq.heappop(heap)
+        for _ in range(len(nums) - k):
+            heapq.heappop(heap)
         
-    return heapq.heappop(heap)
+        return heapq.heappop(heap)
 
 # Alternative solution in O(n) average time using quickselect
 class Solution:
@@ -98,7 +105,8 @@ class Solution:
 """
 253. Meeting Rooms II
 
-Given an array of meeting time intervals consisting of start and end times [[s1,e1],[s2,e2],...] (si < ei), find the minimum number of conference rooms required.
+Given an array of meeting time intervals consisting of start and end times [[s1,e1],[s2,e2],...] (si < ei), 
+find the minimum number of conference rooms required.
 
 Example 1:
 Input: [[0, 30],[5, 10],[15, 20]]

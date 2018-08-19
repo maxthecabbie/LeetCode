@@ -1,9 +1,12 @@
 """
 771. Jewels and Stones
 
-You're given strings J representing the types of stones that are jewels, and S representing the stones you have.  Each character in S is a type of stone you have.  You want to know how many of the stones you have are also jewels.
+You're given strings J representing the types of stones that are jewels, and S representing the stones you 
+have.  Each character in S is a type of stone you have.  You want to know how many of the stones you have 
+are also jewels.
 
-The letters in J are guaranteed distinct, and all characters in J and S are letters. Letters are case sensitive, so "a" is considered a different type of stone from "A".
+The letters in J are guaranteed distinct, and all characters in J and S are letters. Letters are case 
+sensitive, so "a" is considered a different type of stone from "A".
 
 Example 1:
 Input: J = "aA", S = "aAAbbbb"
@@ -30,14 +33,14 @@ class Solution:
             if c in jset: n += 1
         return n
 
-
-
 """
 760. Find Anagram Mappings
 
-Given two lists Aand B, and B is an anagram of A. B is an anagram of A means B is made by randomizing the order of the elements in A.
+Given two lists Aand B, and B is an anagram of A. B is an anagram of A means B is made by randomizing the 
+order of the elements in A.
 
-We want to find an index mapping P, from A to B. A mapping P[i] = j means the ith element in A appears in B at index j.
+We want to find an index mapping P, from A to B. A mapping P[i] = j means the ith element in A appears in B 
+at index j.
 
 These lists A and B may contain duplicates. If there are multiple answers, output any of them.
 
@@ -47,7 +50,8 @@ B = [50, 12, 32, 46, 28]
 
 We should return
 [1, 4, 3, 2, 0]
-as P[0] = 1 because the 0th element of A appears at B[1], and P[1] = 4 because the 1st element of A appears at B[4], and so on.
+as P[0] = 1 because the 0th element of A appears at B[1], and P[1] = 4 because the 1st element of A appears 
+at B[4], and so on.
 
 Note:
 A, B have equal lengths in range [1, 100].
@@ -63,17 +67,49 @@ class Solution:
         bmap = {v: i for i, v in enumerate(B)}
         return [bmap[v] for v in A]     
 
+"""
+709. To Lower Case
+
+Implement function ToLowerCase() that has a string parameter str, and returns the same string in lowercase.
+
+Example 1:
+
+Input: "Hello"
+Output: "hello"
+
+Example 2:
+Input: "here"
+Output: "here"
+
+Example 3:
+Input: "LOVELY"
+Output: "lovely"
+"""
+
+class Solution:
+    def toLowerCase(self, s):
+        """
+        :type str: str
+        :rtype: str
+        """
+        d = ord("A") - ord("a")
+        res = [chr(ord(c) - d) if c.isalpha() and ord(c) < ord("a") else c for c in s]
+        return "".join(res)
 
 
 """
 804. Unique Morse Code Words
-International Morse Code defines a standard encoding where each letter is mapped to a series of dots and dashes, as follows: "a" maps to ".-", "b" maps to "-...", "c" maps to "-.-.", and so on.
+International Morse Code defines a standard encoding where each letter is mapped to a series of dots and 
+dashes, as follows: "a" maps to ".-", "b" maps to "-...", "c" maps to "-.-.", and so on.
 
 For convenience, the full table for the 26 letters of the English alphabet is given below:
 
-[".-","-...","-.-.","-..",".","..-.","--.","....","..",".---","-.-",".-..","--","-.","---",".--.","--.-",".-.","...","-","..-","...-",".--","-..-","-.--","--.."]
+[".-","-...","-.-.","-..",".","..-.","--.","....","..",".---","-.-",".-..","--","-.","---",".--.","--.-",".-.
+","...","-","..-","...-",".--","-..-","-.--","--.."]
 
-Now, given a list of words, each word can be written as a concatenation of the Morse code of each letter. For example, "cab" can be written as "-.-.-....-", (which is the concatenation "-.-." + "-..." + ".-"). We'll call such a concatenation, the transformation of a word.
+Now, given a list of words, each word can be written as a concatenation of the Morse code of each letter. 
+For example, "cab" can be written as "-.-.-....-", (which is the concatenation "-.-." + "-..." + ".-"). 
+We'll call such a concatenation, the transformation of a word.
 
 Return the number of different transformations among all words we have.
 
@@ -108,16 +144,17 @@ class Solution:
                     "...-",".--","-..-","-.--","--.."]
         return "".join([alphabet[ord(c) - ord("a")] for c in word])
 
-
-
 """
 832. Flipping an Image
 
-Given a binary matrix A, we want to flip the image horizontally, then invert it, and return the resulting image.
+Given a binary matrix A, we want to flip the image horizontally, then invert it, and return the resulting 
+image.
 
-To flip an image horizontally means that each row of the image is reversed.  For example, flipping [1, 1, 0] horizontally results in [0, 1, 1].
+To flip an image horizontally means that each row of the image is reversed.  For example, flipping [1, 1, 0] 
+horizontally results in [0, 1, 1].
 
-To invert an image means that each 0 is replaced by 1, and each 1 is replaced by 0. For example, inverting [0, 1, 1] results in [1, 0, 0].
+To invert an image means that each 0 is replaced by 1, and each 1 is replaced by 0. For example, inverting [
+0, 1, 1] results in [1, 0, 0].
 
 Example 1:
 Input: [[1,1,0],[1,0,1],[0,0,0]]
@@ -146,14 +183,15 @@ class Solution:
                 row[i], row[~i] = row[~i] ^ 1, row[i] ^ 1
         return A
 
-
-
 """
 657. Judge Route Circle
 
-Initially, there is a Robot at position (0, 0). Given a sequence of its moves, judge if this robot makes a circle, which means it moves back to the original place.
+Initially, there is a Robot at position (0, 0). Given a sequence of its moves, judge if this robot makes a 
+circle, which means it moves back to the original place.
 
-The move sequence is represented by a string. And each move is represent by a character. The valid robot moves are R (Right), L (Left), U (Up) and D (down). The output should be true or false representing whether the robot makes a circle.
+The move sequence is represented by a string. And each move is represent by a character. The valid robot 
+moves are R (Right), L (Left), U (Up) and D (down). The output should be true or false representing whether 
+the robot makes a circle.
 
 Example 1:
 Input: "UD"
@@ -184,7 +222,8 @@ class Solution:
 """
 561. Array Partition I
 
-Given an array of 2n integers, your task is to group these integers into n pairs of integer, say (a1, b1), (a2, b2), ..., (an, bn) which makes sum of min(ai, bi) for all i from 1 to n as large as possible.
+Given an array of 2n integers, your task is to group these integers into n pairs of integer, say (a1, b1), (
+a2, b2), ..., (an, bn) which makes sum of min(ai, bi) for all i from 1 to n as large as possible.
 
 Example 1:
 Input: [1,4,3,2]
@@ -311,7 +350,8 @@ matrix will have a number of rows and columns in range [1, 20].
 matrix[i][j] will be integers in range [0, 99].
 
 Follow up:
-What if the matrix is stored on disk, and the memory is limited such that you can only load at most one row of the matrix into the memory at once?
+What if the matrix is stored on disk, and the memory is limited such that you can only load at most one row 
+of the matrix into the memory at once?
 What if the matrix is so large that you can only load up a partial row into the memory at once?
 """
 
@@ -333,7 +373,11 @@ class Solution(object):
 
 """
 463. Island Perimeter
-You are given a map in form of a two-dimensional integer grid where 1 represents land and 0 represents water. Grid cells are connected horizontally/vertically (not diagonally). The grid is completely surrounded by water, and there is exactly one island (i.e., one or more connected land cells). The island doesn't have "lakes" (water inside that isn't connected to the water around the island). One cell is a square with side length 1. The grid is rectangular, width and height don't exceed 100. Determine the perimeter of the island.
+You are given a map in form of a two-dimensional integer grid where 1 represents land and 0 represents 
+water. Grid cells are connected horizontally/vertically (not diagonally). The grid is completely surrounded 
+by water, and there is exactly one island (i.e., one or more connected land cells). The island doesn't have 
+"lakes" (water inside that isn't connected to the water around the island). One cell is a square with side 
+length 1. The grid is rectangular, width and height don't exceed 100. Determine the perimeter of the island.
 
 Example:
 [[0,1,0,0],
@@ -372,7 +416,8 @@ class Solution:
 
 Write a program that outputs the string representation of numbers from 1 to n.
 
-But for multiples of three it should output “Fizz” instead of the number and for the multiples of five output “Buzz”. For numbers which are multiples of both three and five output “FizzBuzz”.
+But for multiples of three it should output “Fizz” instead of the number and for the multiples of five 
+output “Buzz”. For numbers which are multiples of both three and five output “FizzBuzz”.
 
 Example:
 n = 15,
@@ -418,7 +463,9 @@ class Solution:
 """
 293. Flip Game
 
-You are playing the following Flip Game with your friend: Given a string that contains only these two characters: + and -, you and your friend take turns to flip two consecutive "++" into "--". The game ends when a person can no longer make a move and therefore the other person will be the winner.
+You are playing the following Flip Game with your friend: Given a string that contains only these two 
+characters: + and -, you and your friend take turns to flip two consecutive "++" into "--". The game ends 
+when a person can no longer make a move and therefore the other person will be the winner.
 
 Write a function to compute all possible states of the string after one valid move.
 
@@ -516,7 +563,8 @@ class Solution:
 """
 283. Move Zeroes
 
-Given an array nums, write a function to move all 0's to the end of it while maintaining the relative order of the non-zero elements.
+Given an array nums, write a function to move all 0's to the end of it while maintaining the relative order 
+of the non-zero elements.
 
 Example:
 Input: [0,1,0,3,12]
@@ -560,11 +608,13 @@ class Solution:
 """
 448. Find All Numbers Disappeared in an Array
 
-Given an array of integers where 1 ≤ a[i] ≤ n (n = size of array), some elements appear twice and others appear once.
+Given an array of integers where 1 ≤ a[i] ≤ n (n = size of array), some elements appear twice and others 
+appear once.
 
 Find all the elements of [1, n] inclusive that do not appear in this array.
 
-Could you do it without extra space and in O(n) runtime? You may assume the returned list does not count as extra space.
+Could you do it without extra space and in O(n) runtime? You may assume the returned list does not count as 
+extra space.
 
 Example:
 Input:
@@ -593,7 +643,8 @@ class Solution(object):
 """
 169. Majority Element
 
-Given an array of size n, find the majority element. The majority element is the element that appears more than ⌊ n/2 ⌋ times.
+Given an array of size n, find the majority element. The majority element is the element that appears more 
+than ⌊ n/2 ⌋ times.
 
 You may assume that the array is non-empty and the majority element always exist in the array.
 
@@ -659,7 +710,8 @@ class Solution:
 
 Given an array of integers, find if the array contains any duplicates.
 
-Your function should return true if any value appears at least twice in the array, and it should return false if every element is distinct.
+Your function should return true if any value appears at least twice in the array, and it should return 
+false if every element is distinct.
 
 Example 1:
 
@@ -687,7 +739,8 @@ class Solution:
 """
 387. First Unique Character in a String
 
-Given a string, find the first non-repeating character in it and return it's index. If it doesn't exist, return -1.
+Given a string, find the first non-repeating character in it and return it's index. If it doesn't exist, 
+return -1.
 
 Examples:
 
@@ -717,6 +770,71 @@ class Solution:
                 return i
 
         return -1
+
+"""
+268. Missing Number
+
+Given an array containing n distinct numbers taken from 0, 1, 2, ..., n, find the one that is missing from 
+the array.
+
+Example 1:
+Input: [3,0,1]
+Output: 2
+
+Example 2:
+Input: [9,6,4,2,3,5,7,0,1]
+Output: 8
+
+Note:
+Your algorithm should run in linear runtime complexity. Could you implement it using only constant extra 
+space complexity?
+"""
+
+class Solution:
+    def missingNumber(self, nums):
+        """
+        :type nums: List[int]
+        :rtype: int
+        """
+        return sum(range(len(nums) + 1)) - sum(nums)
+
+"""
+167. Two Sum II - Input array is sorted
+
+Given an array of integers that is already sorted in ascending order, find two numbers such that they add up 
+to a specific target number.
+
+The function twoSum should return indices of the two numbers such that they add up to the target, where 
+index1 must be less than index2.
+
+Note:
+Your returned answers (both index1 and index2) are not zero-based.
+You may assume that each input would have exactly one solution and you may not use the same element twice.
+Example:
+
+Input: numbers = [2,7,11,15], target = 9
+Output: [1,2]
+Explanation: The sum of 2 and 7 is 9. Therefore index1 = 1, index2 = 2.
+"""
+
+class Solution:
+    def twoSum(self, numbers, target):
+        """
+        :type numbers: List[int]
+        :type target: int
+        :rtype: List[int]
+        """
+        l, r = 0, len(numbers) - 1
+        
+        while l < r:
+            tot = numbers[l] + numbers[r]
+            if tot == target:
+                return [l+1, r+1]
+            if tot > target:
+                r -= 1
+            else:
+                l += 1
+        return [-1, -1]
 
 """
 242. Valid Anagram
@@ -767,7 +885,8 @@ In a string S of lowercase letters, these letters form consecutive groups of the
 
 For example, a string like S = "abbxxxxzyy" has the groups "a", "bb", "xxxx", "z" and "yy".
 
-Call a group large if it has 3 or more characters.  We would like the starting and ending positions of every large group.
+Call a group large if it has 3 or more characters.  We would like the starting and ending positions of every
+ large group.
 
 The final answer should be in lexicographic order.
 
@@ -811,6 +930,59 @@ class Solution:
         return result
 
 """
+844. Backspace String Compare
+
+Given two strings S and T, return if they are equal when both are typed into empty text editors. # means a 
+backspace character.
+
+Example 1:
+Input: S = "ab#c", T = "ad#c"
+Output: true
+Explanation: Both S and T become "ac".
+
+Example 2:
+Input: S = "ab##", T = "c#d#"
+Output: true
+Explanation: Both S and T become "".
+
+Example 3:
+Input: S = "a##c", T = "#a#c"
+Output: true
+Explanation: Both S and T become "c".
+
+Example 4:
+Input: S = "a#c", T = "b"
+Output: false
+Explanation: S becomes "c" while T becomes "b".
+
+Note:
+1 <= S.length <= 200
+1 <= T.length <= 200
+S and T only contain lowercase letters and '#' characters.
+
+Follow up:
+Can you solve it in O(N) time and O(1) space?
+"""
+
+class Solution:
+    def backspaceCompare(self, S, T):
+        """
+        :type S: str
+        :type T: str
+        :rtype: bool
+        """
+        return self.type_str(S) == self.type_str(T)
+    
+    def type_str(self, s):
+        res = []
+        for c in s:
+            if c.isalpha():
+                res.append(c)
+            elif res:
+                res.pop()
+        return "".join(res)
+
+"""
 350. Intersection of Two Arrays II
 
 Given two arrays, write a function to compute their intersection.
@@ -825,7 +997,8 @@ The result can be in any order.
 Follow up:
 What if the given array is already sorted? How would you optimize your algorithm?
 What if nums1's size is small compared to nums2's size? Which algorithm is better?
-What if elements of nums2 are stored on disk, and the memory is limited such that you cannot load all elements into the memory at once?
+What if elements of nums2 are stored on disk, and the memory is limited such that you cannot load all 
+elements into the memory at once?
 """
 
 class Solution:
@@ -866,6 +1039,64 @@ class Solution:
                 p2 += 1
                 
         return result
+
+"""
+27. Remove Element
+
+Given an array nums and a value val, remove all instances of that value in-place and return the new length.
+
+Do not allocate extra space for another array, you must do this by modifying the input array in-place with 
+O(1) extra memory.
+
+The order of elements can be changed. It doesn't matter what you leave beyond the new length.
+
+Example 1:
+Given nums = [3,2,2,3], val = 3,
+
+Your function should return length = 2, with the first two elements of nums being 2.
+
+It doesn't matter what you leave beyond the returned length.
+
+Example 2:
+Given nums = [0,1,2,2,3,0,4,2], val = 2,
+
+Your function should return length = 5, with the first five elements of nums containing 0, 1, 3, 0, and 4.
+
+Note that the order of those five elements can be arbitrary.
+
+It doesn't matter what values are set beyond the returned length.
+Clarification:
+
+Confused why the returned value is an integer but your answer is an array?
+
+Note that the input array is passed in by reference, which means modification to the input array will be 
+known to the caller as well.
+
+Internally you can think of this:
+
+// nums is passed in by reference. (i.e., without making a copy)
+int len = removeElement(nums, val);
+
+// any modification to nums in your function would be known by the caller.
+// using the length returned by your function, it prints the first len elements.
+for (int i = 0; i < len; i++) {
+    print(nums[i]);
+}
+"""
+
+class Solution:
+    def removeElement(self, nums, val):
+        """
+        :type nums: List[int]
+        :type val: int
+        :rtype: int
+        """
+        swap = 0
+        for i in range(len(nums)):
+            if nums[i] != val:
+                nums[swap], nums[i] = nums[i], nums[swap]
+                swap += 1
+        return swap
 
 """
 747. Largest Number At Least Twice of Others
@@ -921,7 +1152,8 @@ class Solution:
 
 Given a non-empty array of digits representing a non-negative integer, plus one to the integer.
 
-The digits are stored such that the most significant digit is at the head of the list, and each element in the array contain a single digit.
+The digits are stored such that the most significant digit is at the head of the list, and each element in 
+the array contain a single digit.
 
 You may assume the integer does not contain any leading zero, except the number 0 itself.
 
@@ -994,7 +1226,8 @@ class Solution:
 """
 643. Maximum Average Subarray I
 
-Given an array consisting of n integers, find the contiguous subarray of given length k that has the maximum average value. And you need to output the maximum average value.
+Given an array consisting of n integers, find the contiguous subarray of given length k that has the maximum 
+average value. And you need to output the maximum average value.
 
 Example 1:
 Input: [1,12,-5,-6,50,3], k = 4
@@ -1023,9 +1256,11 @@ class Solution:
 
 """
 26. Remove Duplicates from Sorted Array
-Given a sorted array nums, remove the duplicates in-place such that each element appear only once and return the new length.
+Given a sorted array nums, remove the duplicates in-place such that each element appear only once and return 
+the new length.
 
-Do not allocate extra space for another array, you must do this by modifying the input array in-place with O(1) extra memory.
+Do not allocate extra space for another array, you must do this by modifying the input array in-place with 
+O(1) extra memory.
 
 Example 1:
 Given nums = [1,1,2],
@@ -1037,14 +1272,16 @@ It doesn't matter what you leave beyond the returned length.
 Example 2:
 Given nums = [0,0,1,1,1,2,2,3,3,4],
 
-Your function should return length = 5, with the first five elements of nums being modified to 0, 1, 2, 3, and 4 respectively.
+Your function should return length = 5, with the first five elements of nums being modified to 0, 1, 2, 3, 
+and 4 respectively.
 
 It doesn't matter what values are set beyond the returned length.
 
 Clarification:
 Confused why the returned value is an integer but your answer is an array?
 
-Note that the input array is passed in by reference, which means modification to the input array will be known to the caller as well.
+Note that the input array is passed in by reference, which means modification to the input array will be 
+known to the caller as well.
 
 Internally you can think of this:
 
@@ -1075,13 +1312,55 @@ class Solution:
         return p
 
 """
+303. Range Sum Query - Immutable
+
+Given an integer array nums, find the sum of the elements between indices i and j (i ≤ j), inclusive.
+
+Example:
+Given nums = [-2, 0, 3, -5, 2, -1]
+
+sumRange(0, 2) -> 1
+sumRange(2, 5) -> -1
+sumRange(0, 5) -> -3
+
+Note:
+You may assume that the array does not change.
+There are many calls to sumRange function.
+"""
+
+class NumArray:
+
+    def __init__(self, nums):
+        """
+        :type nums: List[int]
+        """
+        self.running_sums = [0]
+        running_sum = 0
+        for n in nums:
+            running_sum += n
+            self.running_sums.append(running_sum)
+            
+    def sumRange(self, i, j):
+        """
+        :type i: int
+        :type j: int
+        :rtype: int
+        """
+        return self.running_sums[j+1] - self.running_sums[i] 
+
+# Your NumArray object will be instantiated and called as such:
+# obj = NumArray(nums)
+# param_1 = obj.sumRange(i,j)
+
+"""
 88. Merge Sorted Array
 
 Given two sorted integer arrays nums1 and nums2, merge nums2 into nums1 as one sorted array.
 
 Note:
 The number of elements initialized in nums1 and nums2 are m and n respectively.
-You may assume that nums1 has enough space (size that is greater or equal to m + n) to hold additional elements from nums2.
+You may assume that nums1 has enough space (size that is greater or equal to m + n) to hold additional 
+elements from nums2.
 
 Example:
 Input:
@@ -1175,7 +1454,8 @@ Output: -1
 Clarification:
 What should we return when needle is an empty string? This is a great question to ask during an interview.
 
-For the purpose of this problem, we will return 0 when needle is an empty string. This is consistent to C's strstr() and Java's indexOf().
+For the purpose of this problem, we will return 0 when needle is an empty string. This is consistent to C's 
+strstr() and Java's indexOf().
 """
 
 class Solution:
@@ -1203,9 +1483,11 @@ class Solution:
 
 The API: int read4(char *buf) reads 4 characters at a time from a file.
 
-The return value is the actual number of characters read. For example, it returns 3 if there is only 3 characters left in the file.
+The return value is the actual number of characters read. For example, it returns 3 if there is only 3 
+characters left in the file.
 
-By using the read4 API, implement the function int read(char *buf, int n) that reads n characters from the file.
+By using the read4 API, implement the function int read(char *buf, int n) that reads n characters from the 
+file.
 
 Example 1:
 Input: buf = "abc", n = 4
@@ -1358,7 +1640,8 @@ class Solution:
 """
 665. Non-decreasing Array
 
-Given an array with n integers, your task is to check if it could become non-decreasing by modifying at most 1 element.
+Given an array with n integers, your task is to check if it could become non-decreasing by modifying at most 
+1 element.
 
 We define an array is non-decreasing if array[i] <= array[i + 1] holds for every i (1 <= i < n).
 

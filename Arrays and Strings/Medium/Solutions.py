@@ -44,6 +44,65 @@ class Codec:
 # codec.decode(codec.encode(url))
 
 """
+544. Output Contest Matches
+
+During the NBA playoffs, we always arrange the rather strong team to play with the rather weak team, like 
+make the rank 1 team play with the rank nth team, which is a good strategy to make the contest more 
+interesting. Now, you're given n teams, you need to output their final contest matches in the form of a 
+string.
+
+The n teams are given in the form of positive integers from 1 to n, which represents their initial rank. (
+Rank 1 is the strongest team and Rank n is the weakest team.) We'll use parentheses('(', ')') and 
+commas(',') to represent the contest team pairing - parentheses('(' , ')') for pairing and commas(',') for 
+partition. During the pairing process in each round, you always need to follow the strategy of making the 
+rather strong one pair with the rather weak one.
+
+Example 1:
+Input: 2
+Output: (1,2)
+Explanation: 
+Initially, we have the team 1 and the team 2, placed like: 1,2.
+Then we pair the team (1,2) together with '(', ')' and ',', which is the final answer.
+
+Example 2:
+Input: 4
+Output: ((1,4),(2,3))
+Explanation: 
+In the first round, we pair the team 1 and 4, the team 2 and 3 together, as we need to make the strong team 
+and weak team together.
+And we got (1,4),(2,3).
+In the second round, the winners of (1,4) and (2,3) need to play again to generate the final winner, so you 
+need to add the paratheses outside them.
+And we got the final answer ((1,4),(2,3)).
+
+Example 3:
+Input: 8
+Output: (((1,8),(4,5)),((2,7),(3,6)))
+Explanation: 
+First round: (1,8),(2,7),(3,6),(4,5)
+Second round: ((1,8),(4,5)),((2,7),(3,6))
+Third round: (((1,8),(4,5)),((2,7),(3,6)))
+Since the third round will generate the final winner, you need to output the answer 
+(((1,8),(4,5)),((2,7),(3,6))).
+
+Note:
+The n is in range [2, 212].
+We ensure that the input n can be converted into the form 2k, where k is a positive integer.
+"""
+
+class Solution:
+    def findContestMatch(self, n):
+        """
+        :type n: int
+        :rtype: str
+        """
+        result = tuple(range(1, n+1))
+        
+        while len(result) > 2:
+            result = tuple((result[i], result[~i]) for i in range(len(result)//2))
+        return str(result).replace(" ", "")
+
+"""
 531. Lonely Pixel I
 
 Given a picture consisting of black and white pixels, find the number of black lonely pixels.
@@ -159,6 +218,108 @@ class Solution:
         return "".join(result)
 
 """
+748. Shortest Completing Word
+
+Find the minimum length word from a given dictionary words, which has all the letters from the string 
+licensePlate. Such a word is said to complete the given string licensePlate
+
+Here, for letters we ignore case. For example, "P" on the licensePlate still matches "p" on the word.
+
+It is guaranteed an answer exists. If there are multiple answers, return the one that occurs first in the 
+array.
+
+The license plate might have the same letter occurring multiple times. For example, given a licensePlate of 
+"PP", the word "pair" does not complete the licensePlate, but the word "supper" does.
+
+Example 1:
+Input: licensePlate = "1s3 PSt", words = ["step", "steps", "stripe", "stepple"]
+Output: "steps"
+Explanation: The smallest length word that contains the letters "S", "P", "S", and "T".
+Note that the answer is not "step", because the letter "s" must occur in the word twice.
+Also note that we ignored case for the purposes of comparing whether a letter exists in the word.
+
+Example 2:
+Input: licensePlate = "1s3 456", words = ["looks", "pest", "stew", "show"]
+Output: "pest"
+Explanation: There are 3 smallest length words that contains the letters "s".
+We return the one that occurred first.
+
+Note:
+licensePlate will be a string with length in range [1, 7].
+licensePlate will contain digits, spaces, or letters (uppercase or lowercase).
+words will have a length in the range [10, 1000].
+Every words[i] will consist of lowercase letters, and have length in range [1, 15].
+"""
+
+class Solution:
+    def shortestCompletingWord(self, licensePlate, words):
+        """
+        :type licensePlate: str
+        :type words: List[str]
+        :rtype: str
+        """
+        freq = self.build_freq(licensePlate)
+        result = None
+
+        for w in words:
+            freq_w = self.build_freq(w)
+            complete = True
+            
+            for key in freq:
+                if freq_w.get(key, -1) < freq[key]:
+                    complete = False
+                    break
+                    
+            if complete:
+                result = w if not result or len(w) < len(result) else result
+                
+        return result
+    
+    def build_freq(self, word):
+        freq = {}
+        for c in word:
+            if c.isalpha():
+                freq[c.lower()] = freq.get(c.lower(), 0) + 1
+        return freq
+
+"""
+238. Product of Array Except Self
+
+Given an array nums of n integers where n > 1,  return an array output such that output[i] is equal to the 
+product of all the elements of nums except nums[i].
+
+Example:
+Input:  [1,2,3,4]
+Output: [24,12,8,6]
+
+Note: Please solve it without division and in O(n).
+
+Follow up:
+Could you solve it with constant space complexity? (The output array does not count as extra space for the 
+purpose of space complexity analysis.)
+"""
+
+class Solution:
+    def productExceptSelf(self, nums):
+        """
+        :type nums: List[int]
+        :rtype: List[int]
+        """
+        if len(nums) <= 0: 
+            return [0]
+        
+        l, r = 1, 1
+        result = [1 for _ in range(len(nums))]
+        
+        for i in range(len(nums)):
+            result[i] *= l
+            result[len(nums) - i - 1] *= r
+            l *= nums[i]
+            r *= nums[len(nums) - i - 1]
+        
+        return result
+
+"""
 667. Beautiful Arrangement II
 
 Given two integers n and k, you need to construct a list which contains n different positive integers 
@@ -216,80 +377,70 @@ class Solution:
         return result
 
 """
-238. Product of Array Except Self
+676. Implement Magic Dictionary
 
-Given an array nums of n integers where n > 1,  return an array output such that output[i] is equal to the 
-product of all the elements of nums except nums[i].
+Implement a magic directory with buildDict, and search methods.
 
-Example:
-Input:  [1,2,3,4]
-Output: [24,12,8,6]
+For the method buildDict, you'll be given a list of non-repetitive words to build a dictionary.
 
-Note: Please solve it without division and in O(n).
+For the method search, you'll be given a word, and judge whether if you modify exactly one character into 
+another character in this word, the modified word is in the dictionary you just built.
 
-Follow up:
-Could you solve it with constant space complexity? (The output array does not count as extra space for the 
-purpose of space complexity analysis.)
+Example 1:
+Input: buildDict(["hello", "leetcode"]), Output: Null
+Input: search("hello"), Output: False
+Input: search("hhllo"), Output: True
+Input: search("hell"), Output: False
+Input: search("leetcoded"), Output: False
+
+Note:
+You may assume that all the inputs are consist of lowercase letters a-z.
+For contest purpose, the test data is rather small by now. You could think about highly efficient algorithm 
+after the contest.
+Please remember to RESET your class variables declared in class MagicDictionary, as static/class variables 
+are persisted across multiple test cases. Please see here for more details.
 """
 
-class Solution:
-    def productExceptSelf(self, nums):
+class MagicDictionary:
+
+    def __init__(self):
         """
-        :type nums: List[int]
-        :rtype: List[int]
+        Initialize your data structure here.
         """
-        if len(nums) <= 0: return [0]
-        
-        l = 1
-        r = 1
-        result = [1 for _ in range(len(nums))]
-        
-        for i in range(len(nums)):
-            result[i] *= l
-            result[len(nums) - i - 1] *= r
-            l *= nums[i]
-            r *= nums[len(nums) - i - 1]
-        
-        return result
+        self.word_dict = {}
 
-"""
-347. Top K Frequent Elements
-
-Given a non-empty array of integers, return the k most frequent elements.
-
-For example,
-Given [1,1,1,2,2,3] and k = 2, return [1,2].
-
-Note: 
-You may assume k is always valid, 1 ≤ k ≤ number of unique elements.
-Your algorithm's time complexity must be better than O(n log n), where n is the array's size.
-"""
-
-class Solution:
-    def topKFrequent(self, nums, k):
+    def buildDict(self, dict):
         """
-        :type nums: List[int]
-        :type k: int
-        :rtype: List[int]
+        Build a dictionary through a list of words
+        :type dict: List[str]
+        :rtype: void
         """
-        freq = {}
-        buckets = [[] for _ in range(len(nums) + 1)]
+        for word in dict:
+            self.word_dict.setdefault(len(word), []).append(word)
+
+    def search(self, word):
+        """
+        Returns if there is any word in the trie that equals to the given word after modifying exactly one 
+        character
+        :type word: str
+        :rtype: bool
+        """
+        bucket = self.word_dict.get(len(word), [])
         
-        for n in nums:
-            freq[n] = freq.get(n, 0) + 1
-        
-        for key in freq:
-            buckets[freq[key]].append(key)
-        
-        result = []
-        for i in range(len(buckets) - 1, -1, -1):
-            for n in buckets[i]:
-                if k == 0:
-                    break
-                result.append(n)
-                k -= 1
-        
-        return result
+        for comp in bucket:
+            diff = 0
+            for i in range(len(word)):
+                if word[i] != comp[i]:
+                    diff += 1
+            if diff == 1:
+                return True
+            
+        return False
+    
+# Your MagicDictionary object will be instantiated and called as such:
+# obj = MagicDictionary()
+# obj.buildDict(dict)
+# param_2 = obj.search(word)
 
 """
 769. Max Chunks To Make Sorted
@@ -324,7 +475,7 @@ chunks variable keeps track of the chunks we can sort so far
 - At every index in our array, we first update max_num and then check if max_num is less than or equal to 
 the current index
 	- If it is, that means we can make a sorted chunk since the rest of the elements below it are less than 
-    or equal to the max_num, and no number in a higher index is greater than max_num. Increase chunks by 1
+    or equal to the max_num, and no number in a higher index is less than max_num. Increase chunks by 1
     - Else, that means max_num is greater than the current index, and we cannot make a sorted chunk since if 
     we make a sorted chunk, then the max_num will not be in the correct index and will be out of place
 - Return chunks
@@ -399,11 +550,35 @@ class Solution:
         
         for i in range(len(C)):
             for j in range(len(D)):
-                cd = C[i] + D[j]
-                check = 0 - cd
-                if check in ab_sum:
-                    count += ab_sum[check]
+                check = -(C[i] + D[j])
+                count += ab_sum.get(check, 0)
+        
         return count
+
+"""
+357. Count Numbers with Unique Digits
+
+Given a non-negative integer n, count all numbers with unique digits, x, where 0 ≤ x < 10n.
+
+Example:
+Given n = 2, return 91. (The answer should be the total numbers in the range of 0 ≤ x < 100, excluding 
+[11,22,33,44,55,66,77,88,99])
+"""
+
+class Solution:
+    def countNumbersWithUniqueDigits(self, n):
+        """
+        :type n: int
+        :rtype: int
+        """
+        choices = [9, 9, 8, 7, 6, 5, 4, 3, 2, 1]
+        ans, product = 0, 1
+        
+        for i in range(min(n, 10)):
+            product *= choices[i]
+            ans += product
+        
+        return ans + 1
 
 """
 78. Subsets
@@ -433,18 +608,18 @@ class Solution:
         :type nums: List[int]
         :rtype: List[List[int]]
         """
-        result = [[]]
+        res = [[]]
         
         for i in range(len(nums)):
-            new_result = []
-            for sub in result:
-                cpy = sub[:]
-                cpy.append(nums[i])
-                new_result.append(cpy)
-            result += new_result
+            more_res = []
+            for r in res:
+                sub = r[:]
+                sub.append(nums[i])
+                more_res.append(sub)
+            res += more_res
+            
+        return res
         
-        return result
-
 """
 487. Max Consecutive Ones II
 
@@ -483,8 +658,7 @@ class Solution:
         :rtype: int
         """
         max_count = 0
-        count = 0
-        prev = 0
+        prev, count = 0, 0
         
         for i in range(len(nums)):
             if nums[i] == 1:
@@ -551,6 +725,73 @@ class Solution(object):
                 diff = diff_to_z + (ord("z") - ord(s[i-1]))
             seq.append(str(diff))
         return ":".join(seq)
+
+"""
+533. Lonely Pixel II
+
+Given a picture consisting of black and white pixels, and a positive integer N, find the number of black 
+pixels located at some specific row R and column C that align with all the following rules:
+
+Row R and column C both contain exactly N black pixels.
+For all rows that have a black pixel at column C, they should be exactly the same as row R
+The picture is represented by a 2D char array consisting of 'B' and 'W', which means black and white pixels 
+respectively.
+
+Example:
+Input:                                            
+[['W', 'B', 'W', 'B', 'B', 'W'],    
+ ['W', 'B', 'W', 'B', 'B', 'W'],    
+ ['W', 'B', 'W', 'B', 'B', 'W'],    
+ ['W', 'W', 'B', 'W', 'B', 'W']] 
+
+N = 3
+Output: 6
+Explanation: All the bold 'B' are the black pixels we need (all 'B's at column 1 and 3).
+        0    1    2    3    4    5         column index                                            
+0    [['W', 'B', 'W', 'B', 'B', 'W'],    
+1     ['W', 'B', 'W', 'B', 'B', 'W'],    
+2     ['W', 'B', 'W', 'B', 'B', 'W'],    
+3     ['W', 'W', 'B', 'W', 'B', 'W']]    
+row index
+
+Take 'B' at row R = 0 and column C = 1 as an example:
+Rule 1, row R = 0 and column C = 1 both have exactly N = 3 black pixels. 
+Rule 2, the rows have black pixel at column C = 1 are row 0, row 1 and row 2. They are exactly the same as 
+row R = 0.
+"""
+
+class Solution:
+    def findBlackPixel(self, picture, N):
+        """
+        :type picture: List[List[str]]
+        :type N: int
+        :rtype: int
+        """
+        rows_ser = {}
+        cols = [0 for _ in range(len(picture[0]))]
+        
+        for i in range(len(picture)):
+            ser = []
+            b_pixel = 0
+            
+            for j in range(len(picture[0])):
+                ser.append(picture[i][j])
+                if picture[i][j] == "B":
+                    b_pixel += 1
+                    cols[j] += 1
+                    
+            if b_pixel == N:
+                key = "".join(ser)
+                rows_ser[key] = rows_ser.get(key, 0) + 1
+        
+        count = 0
+        for key in rows_ser:
+            if rows_ser[key] == N:
+                for j in range(len(cols)):
+                    if key[j] == "B" and cols[j] == N:
+                        count += N
+                    
+        return count
 
 """
 287. Find the Duplicate Number
@@ -644,81 +885,29 @@ class Solution(object):
         :rtype: List[int]
         """
         nums = [a*(n*n) + b*n + c for n in nums]
-        result = [0] * len(nums)
-        pt1 = 0
-        pt2 = len(nums) - 1
-        i = 0 if a < 0 else len(nums) - 1
+        res = [0 for _ in range(len(nums))]
+        i, j = 0, len(nums) - 1
+        p1, p2 = 0, len(nums) - 1
         
-        while pt1 <= pt2:
-            if a < 0:
-                if nums[pt1] < nums[pt2]:
-                    result[i] = nums[pt1]
-                    pt1 += 1
-                else:
-                    result[i] = nums[pt2]
-                    pt2 -= 1
-                i += 1
-            else:
-                if nums[pt1] > nums[pt2]:
-                    result[i] = nums[pt1]
-                    pt1 += 1
-                else:
-                    result[i] = nums[pt2]
-                    pt2 -= 1
-                i -= 1
-        return result
-            
-"""
-524. Longest Word in Dictionary through Deleting
-
-Given a string and a string dictionary, find the longest string in the dictionary that can be formed by 
-deleting some characters of the given string. If there are more than one possible results, return the 
-longest word with the smallest lexicographical order. If there is no possible result, return the empty 
-string.
-
-Example 1:
-Input:
-s = "abpcplea", d = ["ale","apple","monkey","plea"]
-
-Output: 
-"apple"
-
-Example 2:
-Input:
-s = "abpcplea", d = ["a","b","c"]
-
-Output: 
-"a"
-
-Note:
-All the strings in the input will only contain lower-case letters.
-The size of the dictionary won't exceed 1,000.
-The length of all the strings in the input won't exceed 1,000.
-
-Solution Explanation
-- We sort our dictionary by length and lexicographic order
-- Then for each word in the dictionary, we see if that word is a subsequence of the string s, and if it is 
-we return that word
-"""
-
-class Solution:
-    def findLongestWord(self, s, d):
-        """
-        :type s: str
-        :type d: List[str]
-        :rtype: str
-        """
-        d.sort(key = lambda s: (-len(s), s))
-        
-        for word in d:
-            i = 0
-            for ch in s:
-                if ch == word[i]:
+        while i <= j:
+            if a >= 0:
+                if nums[i] >= nums[j]:
+                    res[p2] = nums[i]
                     i += 1
-                if i == len(word):
-                    return word
-        return ""
-
+                else:
+                    res[p2] = nums[j]
+                    j -= 1
+                p2 -= 1
+            else:
+                if nums[i] <= nums[j]:
+                    res[p1] = nums[i]
+                    i += 1
+                else:
+                    res[p1] = nums[j]
+                    j -= 1
+                p1 += 1
+        
+        return res
 """
 325. Maximum Size Subarray Sum Equals k
 
@@ -788,7 +977,8 @@ Rotate the image by 90 degrees (clockwise).
 
 Note:
 
-You have to rotate the image in-place, which means you have to modify the input 2D matrix directly. DO NOT allocate another 2D matrix and do the rotation.
+You have to rotate the image in-place, which means you have to modify the input 2D matrix directly. DO NOT 
+allocate another 2D matrix and do the rotation.
 
 Example 1:
 Given input matrix = 
@@ -844,11 +1034,84 @@ class Solution:
             layer_iterations -= 2
 
 """
+377. Combination Sum IV
+
+Given an integer array with all positive numbers and no duplicates, find the number of possible combinations 
+that add up to a positive integer target.
+
+Example:
+nums = [1, 2, 3]
+target = 4
+
+The possible combination ways are:
+(1, 1, 1, 1)
+(1, 1, 2)
+(1, 2, 1)
+(1, 3)
+(2, 1, 1)
+(2, 2)
+(3, 1)
+
+Note that different sequences are counted as different combinations.
+
+Therefore the output is 7.
+
+Follow up:
+What if negative numbers are allowed in the given array?
+How does it change the problem?
+What limitation we need to add to the question to allow negative numbers?
+"""
+
+class Solution:
+    def combinationSum4(self, nums, target):
+        """
+        :type nums: List[int]
+        :type target: int
+        :rtype: int
+        """
+        dp = [0] * (target + 1)
+        dp[0] = 1
+        
+        for i in range(1, target + 1):
+            for n in nums:
+                if n <= target:
+                    dp[i] += dp[i - n]
+        
+        return dp[target]
+
+# Alternative top down solution        
+class Solution:
+    def combinationSum4(self, nums, target):
+        """
+        :type nums: List[int]
+        :type target: int
+        :rtype: int
+        """
+        
+        return self.combo_helper(nums, 0, target, {})
+    
+    def combo_helper(self, nums, i, target, cache):
+        if target == 0:
+            return 1
+        elif target < 0:
+            return 0
+    
+        if cache.get(target, None):
+            return cache[target]
+        
+        cache[target] = 0
+        for n in nums:
+            cache[target] += self.combo_helper(nums, i+1, target - n, cache)
+            
+        return cache[target]
+
+"""
 846. Hand of Straights
 
 Alice has a hand of cards, given as an array of integers.
 
-Now she wants to rearrange the cards into groups so that each group is size W, and consists of W consecutive cards.
+Now she wants to rearrange the cards into groups so that each group is size W, and consists of W consecutive 
+cards.
 
 Return true if and only if she can.
 
@@ -871,25 +1134,26 @@ Note:
 class Solution:
     def isNStraightHand(self, hand, W):
         freq = {}
-        
         for n in hand:
             freq[n] = freq.get(n, 0) + 1
+        cards = sorted([key for key in freq])
         
-        hand.sort()
-        
-        for i in range(len(hand)):
-            if hand[i] > 0:
-                for j in range(W)[::-1]:
-                    if hand[i + j] <= 0:
+        for i in range(len(cards)):
+            key = cards[i]
+            if freq[key] > 0:
+                n = freq[key]
+                for j in range(W):
+                    if key + j not in freq or freq[key + j] <= 0:
                         return False
-                    hand[i + j] -= hand[i]
+                    freq[key + j] -= n
                     
         return True
 
 """
 259. 3Sum Smaller
 
-Given an array of n integers nums and a target, find the number of index triplets i, j, k with 0 <= i < j < k < n that satisfy the condition nums[i] + nums[j] + nums[k] < target.
+Given an array of n integers nums and a target, find the number of index triplets i, j, k with 0 <= i < j < 
+k < n that satisfy the condition nums[i] + nums[j] + nums[k] < target.
 
 Example:
 Input: nums = [-2,0,1,3], and target = 2
@@ -925,31 +1189,113 @@ class Solution:
         return count
 
 """
+816. Ambiguous Coordinates
+
+We had some 2-dimensional coordinates, like "(1, 3)" or "(2, 0.5)".  Then, we removed all commas, decimal 
+points, and spaces, and ended up with the string S.  Return a list of strings representing all possibilities 
+for what our original coordinates could have been.
+
+Our original representation never had extraneous zeroes, so we never started with numbers like "00", "0.0", 
+"0.00", "1.0", "001", "00.01", or any other number that can be represented with less digits.  Also, a 
+decimal point within a number never occurs without at least one digit occuring before it, so we never 
+started with numbers like ".1".
+
+The final answer list can be returned in any order.  Also note that all coordinates in the final answer have 
+exactly one space between them (occurring after the comma.)
+
+Example 1:
+Input: "(123)"
+Output: ["(1, 23)", "(12, 3)", "(1.2, 3)", "(1, 2.3)"]
+
+Example 2:
+Input: "(00011)"
+Output:  ["(0.001, 1)", "(0, 0.011)"]
+Explanation: 
+0.0, 00, 0001 or 00.01 are not allowed.
+
+Example 3:
+Input: "(0123)"
+Output: ["(0, 123)", "(0, 12.3)", "(0, 1.23)", "(0.1, 23)", "(0.1, 2.3)", "(0.12, 3)"]
+
+Example 4:
+Input: "(100)"
+Output: [(10, 0)]
+Explanation: 
+1.0 is not allowed.
+ 
+Note:
+4 <= S.length <= 12.
+S[0] = "(", S[S.length - 1] = ")", and the other elements in S are digits.
+"""
+
+class Solution:
+    def ambiguousCoordinates(self, S):
+        """
+        :type S: str
+        :rtype: List[str]
+        """
+        s = S[1:-1]
+        result = []
+        
+        for i in range(len(s) - 1):
+            l, r = s[:i+1], s[i+1:]
+            lopt, ropt = self.make_opt(l), self.make_opt(r)
+            
+            for (n1, n2) in itertools.product(lopt, ropt):
+                result.append("(" + n1 + ", " + n2 + ")")
+                
+        return result
+    
+    def make_opt(self, s):
+        res = []
+        if self.valid_int(s):
+            res.append(s)
+        for i in range(len(s) - 1):
+            if self.valid_dec(s[:i+1] + "." + s[i+1:]):
+                res.append(s[:i+1] + "." + s[i+1:])
+            else:
+                break
+        return res
+    
+    def valid_int(self, s):
+        return not (len(s) > 1 and s[0] == "0")
+    
+    def valid_dec(self, s):
+        parts = s.split(".")
+        return not (len(parts[0]) > 1 and s[0] == "0") and s[-1] != "0"
+
+"""
 681. Next Closest Time
 
-Given a time represented in the format "HH:MM", form the next closest time by reusing the current digits. There is no limit on how many times a digit can be reused.
+Given a time represented in the format "HH:MM", form the next closest time by reusing the current digits. 
+There is no limit on how many times a digit can be reused.
 
-You may assume the given input string is always valid. For example, "01:34", "12:09" are all valid. "1:34", "12:9" are all invalid.
+You may assume the given input string is always valid. For example, "01:34", "12:09" are all valid. "1:34", 
+"12:9" are all invalid.
 
 Example 1:
 Input: "19:34"
 Output: "19:39"
-Explanation: The next closest time choosing from digits 1, 9, 3, 4, is 19:39, which occurs 5 minutes later.  It is not 19:33, because this occurs 23 hours and 59 minutes later.
+Explanation: The next closest time choosing from digits 1, 9, 3, 4, is 19:39, which occurs 5 minutes later. 
+ It is not 19:33, because this occurs 23 hours and 59 minutes later.
 
 Example 2:
 Input: "23:59"
 Output: "22:22"
-Explanation: The next closest time choosing from digits 2, 3, 5, 9, is 22:22. It may be assumed that the returned time is next day
+Explanation: The next closest time choosing from digits 2, 3, 5, 9, is 22:22. It may be assumed that the 
+returned time is next day
 
 Solution Explanation
 - Generate next closest time by starting at the right most number
 - Sort the numbers we have from the time, and get the low and high numbers
-- Starting at the right, see if there is a larger number in nums, then we can set that digit to the larger number and return the time
+- Starting at the right, see if there is a larger number in nums, then we can set that digit to the larger 
+number and return the time
     - For m2, any larger number will work
     - For m1, the larger number has to be less than 6
     - For h2, the larger number can be any number if the h1 is less than 2, else less than 4
     - For h1, the larger number must be less than 3
-- If you do set a digit to a larger number, must set all digits to the right of it to lowest to get the next lowest time
+- If you do set a digit to a larger number, must set all digits to the right of it to lowest to get the next 
+lowest time
 - If no next closer time can be generated, set all digits to lowest number and return it
 """
 
@@ -986,13 +1332,56 @@ class Solution(object):
         
         if h1 != hi:
             for n in nums:
-                if n > h1 and n < 3 and not (h1 == 2):
+                if n > h1 and n < 2:
                     h1 = n
                     h2, m1, m2 = lo, lo, lo
                     return str(h1) + str(h2) + ":" + str(m1) + str(m2)
         
         h1, h2, m1, m2 = lo, lo, lo, lo
         return str(h1) + str(h2) + ":" + str(m1) + str(m2)
+
+"""
+562. Longest Line of Consecutive One in Matrix
+
+Given a 01 matrix M, find the longest line of consecutive one in the matrix. The line could be horizontal, 
+vertical, diagonal or anti-diagonal.
+
+Example:
+Input:
+[[0,1,1,0],
+ [0,1,1,0],
+ [0,0,0,1]]
+Output: 3
+
+Hint: The number of elements in the given matrix will not exceed 10,000.
+"""
+
+class Solution:
+    def longestLine(self, M):
+        """
+        :type M: List[List[int]]
+        :rtype: int
+        """
+        counts = {}
+        max_count = 0
+        
+        for i in range(len(M)):
+            for j in range(len(M[0])):
+                if M[i][j] == 1:
+                    max_count = max(max_count, 1)
+                    key = str(i) + ":" + str(j)
+                    counts[key] = [1] * 4
+                    
+                    dirs = [(i-1, j-1), (i-1, j), (i-1, j+1), (i, j-1)]
+                    for d in range(len(dirs)):
+                        r, c = dirs[d][0], dirs[d][1]
+                        check = str(r) + ":" + str(c)
+                        
+                        if 0 <= r < len(M) and 0 <= c < len(M[0]) and counts.get(check, False):
+                            new_count = counts[key][d] + counts[check][d]
+                            counts[key][d] = new_count
+                            max_count = max(max_count, new_count)
+        return max_count
 
 """
 380. Insert Delete GetRandom O(1)
@@ -1092,6 +1481,72 @@ class RandomizedSet(object):
 # param_3 = obj.getRandom()
 
 """
+838. Push Dominoes
+
+There are N dominoes in a line, and we place each domino vertically upright.
+
+In the beginning, we simultaneously push some of the dominoes either to the left or to the right.
+
+https://leetcode.com/problems/push-dominoes/description/
+
+After each second, each domino that is falling to the left pushes the adjacent domino on the left.
+
+Similarly, the dominoes falling to the right push their adjacent dominoes standing on the right.
+
+When a vertical domino has dominoes falling on it from both sides, it stays still due to the balance of the 
+forces.
+
+For the purposes of this question, we will consider that a falling domino expends no additional force to a 
+falling or already fallen domino.
+
+Given a string "S" representing the initial state. S[i] = 'L', if the i-th domino has been pushed to the 
+left; S[i] = 'R', if the i-th domino has been pushed to the right; S[i] = '.', if the i-th domino has not 
+been pushed.
+
+Return a string representing the final state. 
+
+Example 1:
+Input: ".L.R...LR..L.."
+Output: "LL.RR.LLRRLL.."
+Example 2:
+
+Input: "RR.L"
+Output: "RR.L"
+Explanation: The first domino expends no additional force on the second domino.
+
+Note:
+0 <= N <= 10^5
+String dominoes contains only 'L', 'R' and '.'
+"""
+
+class Solution:
+    def pushDominoes(self, dominoes):
+        """
+        :type dominoes: str
+        :rtype: str
+        """
+        doms = "L" + dominoes + "R"
+        res = []
+        l = 0
+        
+        for r in range(1, len(doms)):
+            if doms[r] == "L" or doms[r] == "R":
+                if l != 0:
+                    res.append(doms[l])
+                    
+                mid = r-l-1
+                if doms[l] == doms[r]:
+                    res.append(doms[l] * mid)
+                elif doms[l] == "R" and doms[r] == "L":
+                    mid_dom =  "." if mid % 2 != 0 else ""
+                    res.append("R" * (mid//2) + mid_dom + "L" * (mid//2))
+                else:
+                    res.append("." * mid)
+                l = r
+        
+        return "".join(res)
+
+"""
 49. Group Anagrams
 
 Given an array of strings, group anagrams together.
@@ -1189,56 +1644,6 @@ class Solution:
         return count
 
 """
-75. Sort Colors
-
-Given an array with n objects colored red, white or blue, sort them in-place so that objects of the same 
-color are adjacent, with the colors in the order red, white and blue.
-
-Here, we will use the integers 0, 1, and 2 to represent the color red, white, and blue respectively.
-
-Note: You are not suppose to use the library's sort function for this problem.
-
-Example:
-Input: [2,0,2,1,1,0]
-Output: [0,0,1,1,2,2]
-
-Follow up:
-A rather straight forward solution is a two-pass algorithm using counting sort.
-First, iterate the array counting number of 0's, 1's, and 2's, then overwrite array with total number of 
-0's, then 1's and followed by 2's.
-Could you come up with a one-pass algorithm using only constant space?
-"""
-
-class Solution:
-    def sortColors(self, nums):
-        """
-        :type nums: List[int]
-        :rtype: void Do not return anything, modify nums in-place instead.
-        """
-        red = 0
-        white = 0
-        blue = 0
-        
-        for n in nums:
-            if n == 0:
-                red += 1
-            elif n == 1:
-                white += 1
-            else:
-                blue += 1
-        
-        i = 0
-        for _ in range(red):
-            nums[i] = 0
-            i += 1
-        for _ in range(white):
-            nums[i] = 1
-            i += 1
-        for _ in range(blue):
-            nums[i] = 2
-            i += 1
-
-"""
 731. My Calendar II
 
 Implement a MyCalendarTwo class to store your events. A new event can be added if adding the event will not 
@@ -1301,74 +1706,11 @@ class MyCalendarTwo(object):
         for olap in self.overlaps:
             if not (end <= olap[0] or start >= olap[1]):
                 return False
+
         for entry in self.calendar:
             if not (end <= entry[0] or start >= entry[1]):
                 self.overlaps.append([max(start, entry[0]), min(end, entry[1])])
-        self.calendar.append([start, end])
-        return True
 
-# Your MyCalendarTwo object will be instantiated and called as such:
-# obj = MyCalendarTwo()
-# param_1 = obj.book(start,end)
-
-"""
-731. My Calendar II
-
-Implement a MyCalendarTwo class to store your events. A new event can be added if adding the event will not 
-cause a triple booking.
-
-Your class will have one method, book(int start, int end). Formally, this represents a booking on the half 
-open interval [start, end), the range of real numbers x such that start <= x < end.
-
-A triple booking happens when three events have some non-empty intersection (ie., there is some time that is 
-common to all 3 events.)
-
-For each call to the method MyCalendar.book, return true if the event can be added to the calendar 
-successfully without causing a triple booking. Otherwise, return false and do not add the event to the 
-calendar.
-
-Your class will be called like this: MyCalendar cal = new MyCalendar(); MyCalendar.book(start, end)
-
-Example 1:
-MyCalendar();
-MyCalendar.book(10, 20); // returns true
-MyCalendar.book(50, 60); // returns true
-MyCalendar.book(10, 40); // returns true
-MyCalendar.book(5, 15); // returns false
-MyCalendar.book(5, 10); // returns true
-MyCalendar.book(25, 55); // returns true
-Explanation: 
-The first two events can be booked.  The third event can be double booked.
-The fourth event (5, 15) can't be booked, because it would result in a triple booking.
-The fifth event (5, 10) can be booked, as it does not use time 10 which is already double booked.
-The sixth event (25, 55) can be booked, as the time in [25, 40) will be double booked with the third event;
-the time [40, 50) will be single booked, and the time [50, 55) will be double booked with the second event.
-
-Note:
-The number of calls to MyCalendar.book per test case will be at most 1000.
-In calls to MyCalendar.book(start, end), start and end are integers in the range [0, 10^9].
-"""
-
-class MyCalendarTwo(object):
-
-    def __init__(self):
-        self.overlaps = []
-        self.calendar = []
-
-    def book(self, start, end):
-        """
-        :type start: int
-        :type end: int
-        :rtype: bool
-        """
-        for olap in self.overlaps:
-            if (start < olap[1] and olap[0] < end):
-                return False
-            
-        for entry in self.calendar:
-            if not (end <= entry[0] or start >= entry[1]):
-                self.overlaps.append([max(start, entry[0]), min(end, entry[1])])
-                
         self.calendar.append([start, end])
         return True
 
@@ -1469,6 +1811,66 @@ class Solution:
         return True
 
 """
+833. Find And Replace in String
+
+To some string S, we will perform some replacement operations that replace groups of letters with new ones (
+not necessarily the same size).
+
+Each replacement operation has 3 parameters: a starting index i, a source word x and a target word y.  The 
+rule is that if x starts at position i in the original string S, then we will replace that occurrence of x 
+with y.  If not, we do nothing.
+
+For example, if we have S = "abcd" and we have some replacement operation i = 2, x = "cd", y = "ffff", then 
+because "cd" starts at position 2 in the original string S, we will replace it with "ffff".
+
+Using another example on S = "abcd", if we have both the replacement operation i = 0, x = "ab", y = "eee", 
+as well as another replacement operation i = 2, x = "ec", y = "ffff", this second operation does nothing 
+because in the original string S[2] = 'c', which doesn't match x[0] = 'e'.
+
+All these operations occur simultaneously.  It's guaranteed that there won't be any overlap in replacement: 
+for example, S = "abc", indexes = [0, 1], sources = ["ab","bc"] is not a valid test case.
+
+Example 1:
+Input: S = "abcd", indexes = [0,2], sources = ["a","cd"], targets = ["eee","ffff"]
+Output: "eeebffff"
+Explanation: "a" starts at index 0 in S, so it's replaced by "eee".
+"cd" starts at index 2 in S, so it's replaced by "ffff".
+
+Example 2:
+Input: S = "abcd", indexes = [0,2], sources = ["ab","ec"], targets = ["eee","ffff"]
+Output: "eeecd"
+Explanation: "ab" starts at index 0 in S, so it's replaced by "eee". 
+"ec" doesn't starts at index 2 in the original S, so we do nothing.
+
+Notes:
+0 <= indexes.length = sources.length = targets.length <= 100
+0 < indexes[i] < S.length <= 1000
+All characters in given inputs are lowercase letters.
+"""
+
+class Solution:
+    def findReplaceString(self, S, indexes, sources, targets):
+        """
+        :type S: str
+        :type indexes: List[int]
+        :type sources: List[str]
+        :type targets: List[str]
+        :rtype: str
+        """
+        result = list(S)
+        
+        for i in range(len(indexes)):
+            src = sources[i]
+            start = indexes[i]
+            
+            if src == S[start : start + len(src)]:
+                for j in range(start, start + len(src)):
+                    result[j] = ""
+                result[indexes[i]] = targets[i]
+        
+        return "".join(result)
+
+"""
 289. Game of Life
 
 According to the Wikipedia's article: "The Game of Life, also known simply as Life, is a cellular automaton 
@@ -1503,8 +1905,10 @@ Output:
 ]
 
 Follow up:
-Could you solve it in-place? Remember that the board needs to be updated at the same time: You cannot update some cells first and then use their updated values to update other cells.
-In this question, we represent the board using a 2D array. In principle, the board is infinite, which would cause problems when the active area encroaches the border of the array. How would you address these problems?
+Could you solve it in-place? Remember that the board needs to be updated at the same time: You cannot update 
+some cells first and then use their updated values to update other cells.
+In this question, we represent the board using a 2D array. In principle, the board is infinite, which would 
+cause problems when the active area encroaches the border of the array. How would you address these problems?
 """
 
 class Solution:
@@ -1612,6 +2016,69 @@ class Solution:
                 i += 1
                 
         return "".join(result)
+
+"""
+809. Expressive Words
+
+Sometimes people repeat letters to represent extra feeling, such as "hello" -> "heeellooo", "hi" -> 
+"hiiii".  Here, we have groups, of adjacent letters that are all the same character, and adjacent characters 
+to the group are different.  A group is extended if that group is length 3 or more, so "e" and "o" would be 
+extended in the first example, and "i" would be extended in the second example.  As another example, the 
+groups of "abbcccaaaa" would be "a", "bb", "ccc", and "aaaa"; and "ccc" and "aaaa" are the extended groups 
+of that string.
+
+For some given string S, a query word is stretchy if it can be made to be equal to S by extending some 
+groups.  Formally, we are allowed to repeatedly choose a group (as defined above) of characters c, and add 
+some number of the same character c to it so that the length of the group is 3 or more.  Note that we cannot 
+extend a group of size one like "h" to a group of size two like "hh" - all extensions must leave the group 
+extended - ie., at least 3 characters long.
+
+Given a list of query words, return the number of words that are stretchy. 
+
+Example:
+Input: 
+S = "heeellooo"
+words = ["hello", "hi", "helo"]
+Output: 1
+Explanation: 
+We can extend "e" and "o" in the word "hello" to get "heeellooo".
+We can't extend "helo" to get "heeellooo" because the group "ll" is not extended.
+
+Notes:
+0 <= len(S) <= 100.
+0 <= len(words) <= 100.
+0 <= len(words[i]) <= 100.
+S and all words in words consist only of lowercase letters
+"""
+
+class Solution:
+    def expressiveWords(self, S, words):
+        """
+        :type S: str
+        :type words: List[str]
+        :rtype: int
+        """
+        count = 0
+        for w in words:
+            if self.valid(S, w):
+                count += 1
+        return count
+
+    def valid(self, e, w):
+        e1, e2, w1, w2 = 0, 0, 0, 0
+        
+        while e1 < len(e) and w1 < len(w):
+            while e2 < len(e) and e[e2] == e[e1]:
+                e2 += 1
+            while w2 < len(w) and w[w2] == w[w1]:
+                w2 += 1
+            
+            if e[e1] != w[w1] or (w2-w1) > (e2-e1) or (w2-w1 != e2-e1 and (e2-e1) < 3):
+                return False
+
+            e1, w1 = e2, w2
+
+        return e1 >= len(e) and w1 >= len(w)
 
 """
 17. Letter Combinations of a Phone Number
@@ -1752,7 +2219,8 @@ class PhoneDirectory(object):
         @return - Return an available number. Return -1 if none is available.
         :rtype: int
         """
-        if len(self.nums) <= 0: return -1
+        if len(self.nums) <= 0: 
+            return -1
         return self.nums.pop()
         
 
@@ -1968,6 +2436,63 @@ class Solution:
         return str(b) + "A" + str(c) + "B"
 
 """
+658. Find K Closest Elements
+
+Given a sorted array, two integers k and x, find the k closest elements to x in the array. The result should 
+also be sorted in ascending order. If there is a tie, the smaller elements are always preferred.
+
+Example 1:
+Input: [1,2,3,4,5], k=4, x=3
+Output: [1,2,3,4]
+
+Example 2:
+Input: [1,2,3,4,5], k=4, x=-1
+Output: [1,2,3,4]
+
+Note:
+The value k is positive and will always be smaller than the length of the sorted array.
+Length of the given array is positive and will not exceed 104
+Absolute value of elements in the array and x will not exceed 104
+"""
+
+class Solution:
+    def findClosestElements(self, arr, k, x):
+        """
+        :type arr: List[int]
+        :type k: int
+        :type x: int
+        :rtype: List[int]
+        """
+        ind = self.binary_search(arr, x)
+        i = ind-k if (ind-k) >= 0 else 0
+        j = i+k-1
+        
+        while j+1 < len(arr) and abs(arr[j+1] - x) < abs(arr[i] - x):
+            i += 1
+            j += 1
+            
+        return arr[i:j+1]
+    
+    def binary_search(self, arr, t):
+        lo, hi = 0, len(arr) - 1
+        
+        if t < arr[lo]:
+            return lo
+        elif t > arr[hi]:
+            return hi
+        
+        while lo <= hi:
+            mid = (lo + hi)//2
+            if arr[mid] == t:
+                return mid
+            elif arr[mid] > t:
+                hi = mid - 1
+            else:
+                lo = mid + 1
+        
+        return lo if abs(arr[lo] - t) <= abs(arr[hi] - t) else hi
+
+"""
 274. H-Index
 
 Given an array of citations (each citation is a non-negative integer) of a researcher, write a function to 
@@ -2105,40 +2630,6 @@ class Solution:
         return result
 
 """
-56. Merge Intervals
-
-Given a collection of intervals, merge all overlapping intervals.
-
-Example 1:
-Input: [[1,3],[2,6],[8,10],[15,18]]
-Output: [[1,6],[8,10],[15,18]]
-Explanation: Since intervals [1,3] and [2,6] overlaps, merge them into [1,6].
-
-Example 2:
-Input: [[1,4],[4,5]]
-Output: [[1,5]]
-Explanation: Intervals [1,4] and [4,5] are considerred overlapping.
-"""
-
-class Solution:
-    def merge(self, intervals):
-        """
-        :type intervals: List[Interval]
-        :rtype: List[Interval]
-        """
-        intervals.sort(key = lambda i: i.start)
-        result = []
-
-        for i in intervals:
-            if result and i.start <= result[-1].end:
-                prev = result[-1]
-                prev.end = max(prev.end, i.end)
-            else:
-                result.append(i)
-
-        return result
-
-"""
 186. Reverse Words in a String II
 
 Given an input string , reverse the string word by word. 
@@ -2199,23 +2690,70 @@ class Solution:
         :type str: List[str]
         :rtype: void Do not return anything, modify str in-place instead.
         """
-        str = self.reverse(str, 0, len(str) - 1)
+        self.reverse(str, 0, len(str) - 1)
         start = 0
         
         for i in range(len(str)):
             if str[i] == " " or i == len(str) - 1:
-                end = i if i == len(str) - 1 else i - 1
+                end = i if i == len(str) - 1 else i-1
                 self.reverse(str, start, end)
                 start = i + 1
     
-    def reverse(self, str, i, j):        
+    def reverse(self, s, i, j):
         while i < j:
-            temp = str[i]
-            str[i] = str[j]
-            str[j] = temp
+            s[i], s[j] = s[j], s[i]
             i += 1
             j -= 1
-        return str
+
+"""
+522. Longest Uncommon Subsequence II
+
+Given a list of strings, you need to find the longest uncommon subsequence among them. The longest uncommon 
+subsequence is defined as the longest subsequence of one of these strings and this subsequence should not be 
+any subsequence of the other strings.
+
+A subsequence is a sequence that can be derived from one sequence by deleting some characters without 
+changing the order of the remaining elements. Trivially, any string is a subsequence of itself and an empty 
+string is a subsequence of any string.
+
+The input will be a list of strings, and the output needs to be the length of the longest uncommon 
+subsequence. If the longest uncommon subsequence doesn't exist, return -1.
+
+Example 1:
+Input: "aba", "cdc", "eae"
+Output: 3
+
+Note:
+All the given strings' lengths will not exceed 10.
+The length of the given list will be in the range of [2, 50].
+"""
+
+class Solution:
+    def findLUSlength(self, strs):
+        """
+        :type strs: List[str]
+        :rtype: int
+        """
+        strs.sort(key = lambda x: len(x), reverse = True)
+        freq = {}
+        for s in strs:
+            freq[s] = freq.get(s, 0) + 1
+        
+        for i in range(len(strs)):
+            if freq[strs[i]] > 1:
+                continue
+                
+            if all(not self.is_sub(strs[i], strs[j]) for j in range(0, i)):
+                return len(strs[i])
+        return -1
+    
+    def is_sub(self, s1, s2):
+        i, j = 0, 0
+        while i < len(s1) and j < len(s2):
+            if s1[i] == s2[j]:
+                i += 1
+            j += 1
+        return i >= len(s1)
 
 """
 161. One Edit Distance
@@ -2264,35 +2802,147 @@ class Solution:
         :type t: str
         :rtype: bool
         """
-        if abs(len(s) - len(t)) > 1:
-            return False
-        if s == t:
+        if abs(len(s) - len(t)) > 1 or s == t:
             return False
         
-        short = s if len(s) <= len(t) else t
-        long = s if len(s) > len(t) else t
+        long = s if len(s) >= len(t) else t
+        short = s if len(s) < len(t) else t
         
-        pt_s = 0
-        pt_l = 0
+        p_s, p_l = 0, 0
         diff = False
         
-        while pt_s < len(short):
-            if short[pt_s] != long[pt_l]:
+        while p_s < len(short):
+            if short[p_s] != long[p_l]:
                 if diff:
                     return False
                 diff = True
                 
                 if len(short) == len(long):
-                    pt_s += 1
-                    pt_l += 1
+                    p_s += 1
+                    p_l += 1
                     continue
-                pt_l += 1
-                
+                p_l += 1
+            
             else:
-                pt_s += 1
-                pt_l += 1
+                p_s += 1
+                p_l += 1
         
         return True
+
+"""
+356. Line Reflection
+
+Given n points on a 2D plane, find if there is such a line parallel to y-axis that reflect the given points.
+
+Example 1:
+Given points = [[1,1],[-1,1]], return true.
+
+Example 2:
+Given points = [[1,1],[-1,-1]], return false.
+
+Follow up:
+Could you do better than O(n2)?
+"""
+
+class Solution:
+    def isReflected(self, points):
+        """
+        :type points: List[List[int]]
+        :rtype: bool
+        """
+        pset = set()
+        min_x = sys.maxsize
+        max_x = -sys.maxsize - 1
+        
+        for p in points:
+            min_x = min(min_x, p[0])
+            max_x = max(max_x, p[0])
+            pset.add(str(float(p[0])) + ":" + str(float(p[1])))
+        
+        med = (min_x + max_x)/2
+        for p in points:
+            x = med + (med - p[0]) if p[0] <= med else med - (p[0] - med)
+            y = p[1]
+            key = str(float(x)) + ":" + str(float(y))
+            if key not in pset:
+                return False
+        
+        return True
+
+"""
+855. Exam Room
+In an exam room, there are N seats in a single row, numbered 0, 1, 2, ..., N-1.
+
+When a student enters the room, they must sit in the seat that maximizes the distance to the closest 
+person.  If there are multiple such seats, they sit in the seat with the lowest number.  (Also, if no one is 
+in the room, then the student sits at seat number 0.)
+
+Return a class ExamRoom(int N) that exposes two functions: ExamRoom.seat() returning an int representing 
+what seat the student sat in, and ExamRoom.leave(int p) representing that the student in seat number p now 
+leaves the room.  It is guaranteed that any calls to ExamRoom.leave(p) have a student sitting in seat p.
+
+Example 1:
+Input: ["ExamRoom","seat","seat","seat","seat","leave","seat"], [[10],[],[],[],[],[4],[]]
+Output: [null,0,9,4,2,null,5]
+Explanation:
+ExamRoom(10) -> null
+seat() -> 0, no one is in the room, then the student sits at seat number 0.
+seat() -> 9, the student sits at the last seat number 9.
+seat() -> 4, the student sits at the last seat number 4.
+seat() -> 2, the student sits at the last seat number 2.
+leave(4) -> null
+seat() -> 5, the student sits at the last seat number 5.
+
+Note:
+1 <= N <= 10^9
+ExamRoom.seat() and ExamRoom.leave() will be called at most 10^4 times across all test cases.
+Calls to ExamRoom.leave(p) are guaranteed to have a student currently sitting in seat number p.
+"""
+
+class ExamRoom:
+
+    def __init__(self, N):
+        """
+        :type N: int
+        """
+        self.seats = []
+        self.N = N
+        
+    def seat(self):
+        """
+        :rtype: int
+        """
+        if not self.seats:
+            seat = 0
+        else:
+            d_max, seat = self.seats[0], 0
+            
+            for i in range(1, len(self.seats)):
+                prev, curr = self.seats[i-1], self.seats[i]
+                d = (curr - prev)//2
+                
+                if d > d_max:
+                    d_max = d
+                    seat = prev + d
+                    
+            d = self.N - 1
+            if d - self.seats[-1] > d_max:
+                seat = self.N - 1
+                
+        bisect.insort(self.seats, seat)
+        return seat
+
+    def leave(self, p):
+        """
+        :type p: int
+        :rtype: void
+        """
+        self.seats.remove(p)
+        
+# Your ExamRoom object will be instantiated and called as such:
+# obj = ExamRoom(N)
+# param_1 = obj.seat()
+# obj.leave(p)
 
 """
 845. Longest Mountain in Array
@@ -2344,7 +2994,7 @@ the longest mountain found when we are on the "downward" side of a valid mountai
 """
 
 class Solution:
-    def longestMountain(self, arr):
+    def longestMountain(self, A):
         """
         :type A: List[int]
         :rtype: int
@@ -2352,29 +3002,32 @@ class Solution:
         longest = 0
         last_valley = None
         
-        for i in range(len(arr)):
-            if i > 0 and arr[i] == arr[i-1]:
+        for i in range(len(A)):
+            if i > 0 and A[i] == A[i-1]:
                 last_valley = None
-                
-            elif i > 0 and arr[i] < arr[i-1] and last_valley is not None:
+            
+            if i > 0 and A[i] < A[i-1] and last_valley is not None:
                 longest = max(longest, i - last_valley + 1)
-                    
-            if i > 0 and arr[i] <= arr[i-1] or i == 0:
-                if i + 1 < len(arr) and arr[i] < arr[i+1]:
-                    last_valley = i
-                    
+            
+            if (i > 0 and A[i] <= A[i-1] or i == 0) \
+            and i+1 < len(A) and A[i] < A[i+1]:
+                last_valley = i
+                
         return longest if longest >= 3 else 0
             
 """
 31. Next Permutation
 
-Implement next permutation, which rearranges numbers into the lexicographically next greater permutation of numbers.
+Implement next permutation, which rearranges numbers into the lexicographically next greater permutation of 
+numbers.
 
-If such arrangement is not possible, it must rearrange it as the lowest possible order (ie, sorted in ascending order).
+If such arrangement is not possible, it must rearrange it as the lowest possible order (ie, sorted in 
+ascending order).
 
 The replacement must be in-place and use only constant extra memory.
 
-Here are some examples. Inputs are in the left-hand column and its corresponding outputs are in the right-hand column.
+Here are some examples. Inputs are in the left-hand column and its corresponding outputs are in the 
+right-hand column.
 
 1,2,3 → 1,3,2
 3,2,1 → 1,2,3
@@ -2388,13 +3041,13 @@ class Solution:
         """
         rev = 0
 
-        for i in range(len(nums) - 2, -1, -1):
-            if nums[i] < nums[i+1]:
-                rev = i+1
+        for i in range(len(nums) - 1, -1, -1):
+            if i-1 >= 0 and nums[i] > nums[i-1]:
+                rev = i
                 swap = len(nums) - 1
-                while nums[swap] <= nums[i]:
+                while nums[swap] <= nums[i-1]:
                     swap -= 1
-                nums[i], nums[swap] = nums[swap], nums[i]
+                nums[i-1], nums[swap] = nums[swap], nums[i-1]
                 break
 
         end = len(nums) - 1
@@ -2718,12 +3371,12 @@ class Solution:
                 continue
             
             for j in range(i+1, len(nums) - 1):
-                if nums[j] == nums[j-1] and j-1 != i:
+                if j > i+1 and nums[j] == nums[j-1]:
                     continue
 
                 check = -(nums[i] + nums[j])
                 if check in num_ind and num_ind[check] > j:
-                    result.append([nums[i], nums[j], nums[num_ind[check]]])
+                    result.append([nums[i], nums[j], check])
             
         return result
 
@@ -2841,8 +3494,7 @@ class ValidWordAbbr(object):
             if len(self.ab_dict[ab]) == 1 and word in self.ab_dict[ab]:
                 return True
             return False
-        
-        return ab not in self.ab_dict
+        return True
             
     
     def get_ab(self, word):
@@ -2853,6 +3505,7 @@ class ValidWordAbbr(object):
         end = word[-1]
         
         return start + str(len(word) - 2) + end
+
 
 # Your ValidWordAbbr object will be instantiated and called as such:
 # obj = ValidWordAbbr(dictionary)
@@ -2886,39 +3539,41 @@ class Solution:
         :type denominator: int
         :rtype: str
         """
-        if numerator == 0: 
+        if numerator == 0:
             return "0"
         
-        result = []
-        rem = {}
-        if numerator * denominator < 0: 
-            result.append("-")
+        res = []
+        rem_map = {}
+        
+        if numerator * denominator < 0:
+            res.append("-")
         num = abs(numerator)
         den = abs(denominator)
         
-        n = num % den
-        res = num//den
-        result.append(str(res))
-        if res > 0 and n == 0: 
-            return "".join(result)
+        rem = num % den
+        curr = num//den
         
-        result.append(".")
-        pos = len(result)
+        res.append(str(curr))
+        if rem == 0:
+            return "".join(res)
         
-        while n:
-            if n not in rem:
-                rem[n] = pos
+        res.append(".")
+        pos = len(res)
+        
+        while rem:
+            if rem not in rem_map:
+                rem_map[rem] = pos
             else:
-                repeat = "".join(result[rem[n]:])
-                result = result[:rem[n]] + ["(" + repeat + ")"]
+                repeat = "".join(res[rem_map[rem]:])
+                res = res[:rem_map[rem]] + ["(" + repeat + ")"]
                 break
-            n *= 10
-            res = n//den
-            result.append(str(res))
-            n %= den
+            rem *= 10
+            curr = rem//den
+            rem %= den
+            res.append(str(curr))
             pos += 1
             
-        return "".join(result)
+        return "".join(res)
 
 """
 8. String to Integer (atoi)

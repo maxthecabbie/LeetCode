@@ -116,6 +116,73 @@ class Solution:
         return ""
 
 """
+528. Random Pick with Weight
+
+Given an array w of positive integers, where w[i] describes the weight of index i, write a function 
+pickIndex which randomly picks an index in proportion to its weight.
+
+Note:
+1 <= w.length <= 10000
+1 <= w[i] <= 10^5
+pickIndex will be called at most 10000 times.
+
+Example 1:
+Input: 
+["Solution","pickIndex"]
+[[[1]],[]]
+Output: [null,0]
+
+Example 2:
+Input: 
+["Solution","pickIndex","pickIndex","pickIndex","pickIndex","pickIndex"]
+[[[1,3]],[],[],[],[],[]]
+Output: [null,0,1,1,1,0]
+
+Explanation of Input Syntax:
+The input is two lists: the subroutines called and their arguments. Solution's constructor has one argument, 
+the array w. pickIndex has no arguments. Arguments are always wrapped with a list, even if there aren't any.
+"""
+
+class Solution:
+
+    def __init__(self, w):
+        """
+        :type w: List[int]
+        """
+        self.choices = []
+        self.tot = 0
+        
+        last = 0
+        for i in range(len(w)):
+            self.tot += w[i]
+            self.choices.append((last + 1, w[i] + last))
+            last += w[i]
+            
+    def pickIndex(self):
+        """
+        :rtype: int
+        """
+        t = random.randrange(1, self.tot + 1)
+        lo, hi = 0, len(self.choices) - 1
+
+        while lo < hi:
+            mid = (lo + hi)//2
+            r = self.choices[mid]
+            
+            if t >= r[0] and t <= r[1]:
+                return mid
+            elif t < r[0]:
+                hi = mid - 1
+            else:
+                lo = mid + 1
+                
+        return lo
+
+# Your Solution object will be instantiated and called as such:
+# obj = Solution(w)
+# param_1 = obj.pickIndex()
+
+"""
 75. Sort Colors
 
 Given an array with n objects colored red, white or blue, sort them in-place so that objects of the same 
@@ -263,7 +330,6 @@ class Solution:
         j = 0
         
         while i >= 0 and j < len(matrix[0]):
-            print(i, j)
             if matrix[i][j] == target:
                 return True
             elif matrix[i][j] > target:
@@ -272,6 +338,58 @@ class Solution:
                 j += 1
         
         return False
+
+"""
+702. Search in a Sorted Array of Unknown Size
+
+Given an integer array sorted in ascending order, write a function to search target in nums.  If target 
+exists, then return its index, otherwise return -1. However, the array size is unknown to you. You may only 
+access the array using an ArrayReader interface, where ArrayReader.get(k) returns the element of the array 
+at index k (0-indexed).
+
+You may assume all integers in the array are less than 10000, and if you access the array out of bounds, 
+ArrayReader.get will return 2147483647.
+ 
+Example 1:
+Input: array = [-1,0,3,5,9,12], target = 9
+Output: 4
+Explanation: 9 exists in nums and its index is 4
+
+Example 2:
+Input: array = [-1,0,3,5,9,12], target = 2
+Output: -1
+Explanation: 2 does not exist in nums so return -1
+ 
+
+Note:
+You may assume that all elements in the array are unique.
+The value of each element in the array will be in the range [-9999, 9999].
+"""
+
+class Solution:
+    def search(self, reader, target):
+        """
+        :type reader: ArrayReader
+        :type target: int
+        :rtype: int
+        """
+        lo = 0
+        hi = 1
+        while reader.get(hi) < target:
+            hi *= 2
+        
+        while lo <= hi:
+            mid = (lo + hi)//2
+            val = reader.get(mid)
+            
+            if val == target:
+                return mid
+            elif val > target:
+                hi = mid - 1
+            else:
+                lo = mid + 1
+                
+        return -1
 
 """
 33. Search in Rotated Sorted Array
@@ -320,43 +438,7 @@ class Solution:
     def is_between(self, lo, hi, n):
         if lo <= hi:
             return n >= lo and n <= hi
-        else:
-            return n >= lo or n <= hi
-
-class Solution:
-    def searchRange(self, nums, target):
-        """
-        :type nums: List[int]
-        :type target: int
-        :rtype: List[int]
-        """
-        left = self.search_border(nums, target, True)
-        if len(nums) <= 0 or nums[left] != target:
-            return [-1, -1]
-        
-        right = self.search_border(nums, target, False)
-        if nums[right] != target:
-            right -= 1
-            
-        return [left, right]
-    
-    def search_border(self, nums, target, left):
-        lo = 0
-        hi = len(nums) - 1
-        
-        while lo < hi:
-            mid = (lo + hi)//2
-            if nums[mid] == target:
-                if left:
-                    hi = mid
-                else:
-                    lo = mid + 1
-            elif nums[mid] > target:
-                hi = mid - 1
-            else:
-                lo = mid + 1
-        
-        return lo
+        return n >= lo or n <= hi
 
 """
 34. Find First and Last Position of Element in Sorted Array

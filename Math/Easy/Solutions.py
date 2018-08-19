@@ -7,7 +7,8 @@ For example, 128 is a self-dividing number because 128 % 1 == 0, 128 % 2 == 0, a
 
 Also, a self-dividing number is not allowed to contain the digit zero.
 
-Given a lower and upper number bound, output a list of every possible self dividing number, including the bounds if possible.
+Given a lower and upper number bound, output a list of every possible self dividing number, including the 
+bounds if possible.
 
 Example 1:
 Input: 
@@ -57,7 +58,9 @@ Input: 120
 Output: 21
 
 Note:
-Assume we are dealing with an environment which could only store integers within the 32-bit signed integer range: [−231,  231 − 1]. For the purpose of this problem, assume that your function returns 0 when the reversed integer overflows.
+Assume we are dealing with an environment which could only store integers within the 32-bit signed integer 
+range: [−231,  231 − 1]. For the purpose of this problem, assume that your function returns 0 when the 
+reversed integer overflows.
 """
 
 class Solution:

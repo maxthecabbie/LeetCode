@@ -1,9 +1,12 @@
 """
 617. Merge Two Binary Trees
 
-Given two binary trees and imagine that when you put one of them to cover the other, some nodes of the two trees are overlapped while the others are not.
+Given two binary trees and imagine that when you put one of them to cover the other, some nodes of the two 
+trees are overlapped while the others are not.
 
-You need to merge them into a new binary tree. The merge rule is that if two nodes overlap, then sum node values up as the new value of the merged node. Otherwise, the NOT null node will be used as the node of new tree.
+You need to merge them into a new binary tree. The merge rule is that if two nodes overlap, then sum node 
+values up as the new value of the merged node. Otherwise, the NOT null node will be used as the node of new 
+tree.
 
 Example 1:
 Input: 
@@ -46,7 +49,8 @@ class Solution:
 
 Given a binary tree, find its maximum depth.
 
-The maximum depth is the number of nodes along the longest path from the root node down to the farthest leaf node.
+The maximum depth is the number of nodes along the longest path from the root node down to the farthest leaf 
+node.
 
 Note: A leaf is a node with no children.
 
@@ -124,7 +128,8 @@ class Solution:
 """
 653. Two Sum IV - Input is a BST
 
-Given a Binary Search Tree and a target number, return true if there exist two elements in the BST such that their sum is equal to the given target.
+Given a Binary Search Tree and a target number, return true if there exist two elements in the BST such that 
+their sum is equal to the given target.
 
 Example 1:
 Input: 
@@ -186,7 +191,8 @@ class Solution(object):
 
 Given an array where elements are sorted in ascending order, convert it to a height balanced BST.
 
-For this problem, a height-balanced binary tree is defined as a binary tree in which the depth of the two subtrees of every node never differ by more than 1.
+For this problem, a height-balanced binary tree is defined as a binary tree in which the depth of the two 
+subtrees of every node never differ by more than 1.
 
 Example:
 
@@ -228,9 +234,71 @@ class Solution:
         return new_node
 
 """
+671. Second Minimum Node In a Binary Tree
+
+Given a non-empty special binary tree consisting of nodes with the non-negative value, where each node in 
+this tree has exactly two or zero sub-node. If the node has two sub-nodes, then this node's value is the 
+smaller value among its two sub-nodes.
+
+Given such a binary tree, you need to output the second minimum value in the set made of all the nodes' 
+value in the whole tree.
+
+If no such second minimum value exists, output -1 instead.
+
+Example 1:
+Input: 
+    2
+   / \
+  2   5
+     / \
+    5   7
+
+Output: 5
+Explanation: The smallest value is 2, the second smallest value is 5.
+
+Example 2:
+Input: 
+    2
+   / \
+  2   2
+
+Output: -1
+Explanation: The smallest value is 2, but there isn't any second smallest value.
+"""
+
+# Definition for a binary tree node.
+# class TreeNode:
+#     def __init__(self, x):
+#         self.val = x
+#         self.left = None
+#         self.right = None
+class Solution:
+    def findSecondMinimumValue(self, root):
+        """
+        :type root: TreeNode
+        :rtype: int
+        """
+        res = [sys.maxsize] * 2
+        self.find_min(root, res)
+        return res[1] if res[1] != sys.maxsize else -1
+    
+    def find_min(self, root, res):
+        if root is None:
+            return
+        
+        for i in range(len(res)):
+            if root.val <= res[i]:
+                res[i] = root.val
+                break
+        
+        self.find_min(root.left, res)
+        self.find_min(root.right, res)
+
+"""
 270. Closest Binary Search Tree Value
 
-Given a non-empty binary search tree and a target value, find the value in the BST that is closest to the target.
+Given a non-empty binary search tree and a target value, find the value in the BST that is closest to the 
+target.
 
 Note:
 Given target value is a floating point.
@@ -327,7 +395,9 @@ class Solution:
 """
 572. Subtree of Another Tree
 
-Given two non-empty binary trees s and t, check whether tree t has exactly the same structure and node values with a subtree of s. A subtree of s is a tree consists of a node in s and all of this node's descendants. The tree s could also be considered as a subtree of itself.
+Given two non-empty binary trees s and t, check whether tree t has exactly the same structure and node 
+values with a subtree of s. A subtree of s is a tree consists of a node in s and all of this node's 
+descendants. The tree s could also be considered as a subtree of itself.
 
 Example 1:
 Given tree s:

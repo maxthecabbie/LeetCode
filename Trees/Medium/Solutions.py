@@ -186,6 +186,81 @@ class Solution:
             result.append(levels[min_level])
             min_level += 1
         return result
+"""
+450. Delete Node in a BST
+
+Given a root node reference of a BST and a key, delete the node with the given key in the BST. Return the 
+root node reference (possibly updated) of the BST.
+
+Basically, the deletion can be divided into two stages:
+
+Search for a node to remove.
+If the node is found, delete the node.
+Note: Time complexity should be O(height of tree).
+
+Example:
+root = [5,3,6,2,4,null,7]
+key = 3
+
+    5
+   / \
+  3   6
+ / \   \
+2   4   7
+
+Given key to delete is 3. So we find the node with value 3 and delete it.
+
+One valid answer is [5,4,6,2,null,null,7], shown in the following BST.
+
+    5
+   / \
+  4   6
+ /     \
+2       7
+
+Another valid answer is [5,2,6,null,4,null,7].
+
+    5
+   / \
+  2   6
+   \   \
+    4   7
+"""
+
+# Definition for a binary tree node.
+# class TreeNode:
+#     def __init__(self, x):
+#         self.val = x
+#         self.left = None
+#         self.right = None
+
+class Solution:
+    def deleteNode(self, root, key):
+        """
+        :type root: TreeNode
+        :type key: int
+        :rtype: TreeNode
+        """
+        if root is None:
+            return None
+        
+        if key == root.val:
+            if root.left is None:
+                return root.right
+            elif root.right is None:
+                return root.left
+            
+            temp = root.right
+            while temp.left:
+                temp = temp.left
+            root.val = temp.val
+            root.right = self.deleteNode(root.right, temp.val)
+        elif key < root.val:
+            root.left = self.deleteNode(root.left, key)
+        else :
+            root.right = self.deleteNode(root.right, key)
+        
+        return root
 
 """
 654. Maximum Binary Tree
@@ -265,24 +340,20 @@ class Solution:
         if root is None:
             return []
         
-        result = []
-        stack = [root]
         cursor = root.left
+        stack = [root]
+        res = []
         
-        while len(stack) > 0:
+        while stack or cursor:
             while cursor:
                 stack.append(cursor)
                 cursor = cursor.left
             
-            node = stack.pop()
-            result.append(node.val)
-            cursor = node.right
-            
-            while cursor:
-                stack.append(cursor)
-                cursor = cursor.left
-                
-        return result
+            cursor = stack.pop()
+            res.append(cursor.val)
+            cursor = cursor.right
+        
+        return res
 
 """
 230. Kth Smallest Element in a BST
@@ -460,6 +531,134 @@ class Solution:
             result.append(node_vals)
         
         return result
+
+"""
+549. Binary Tree Longest Consecutive Sequence II
+
+Given a binary tree, you need to find the length of Longest Consecutive Path in Binary Tree.
+
+Especially, this path can be either increasing or decreasing. For example, [1,2,3,4] and [4,3,2,1] are both 
+considered valid, but the path [1,2,4,3] is not valid. On the other hand, the path can be in the 
+child-Parent-child order, where not necessarily be parent-child order.
+
+Example 1:
+Input:
+        1
+       / \
+      2   3
+Output: 2
+Explanation: The longest consecutive path is [1, 2] or [2, 1].
+
+Example 2:
+Input:
+        2
+       / \
+      1   3
+Output: 3
+Explanation: The longest consecutive path is [1, 2, 3] or [3, 2, 1].
+
+Note: All the values of tree nodes are in the range of [-1e7, 1e7].
+"""
+
+class Solution:
+    def longestConsecutive(self, root):
+        """
+        :type root: TreeNode
+        :rtype: int
+        """
+        max_n = [0]
+        self.longest_helper(root, max_n)
+        return max_n[0]
+
+    def longest_helper(self, root, max_n):
+        if root is None:
+            return (0, 0)
+
+        inc, dcr = 1, 1
+        if root.left:
+            l = self.longest_helper(root.left, max_n)
+            if root.val - root.left.val == 1:
+                inc += l[0]
+            elif root.left.val - root.val == 1:
+                dcr += l[1]
+
+        if root.right:
+            r = self.longest_helper(root.right, max_n)
+            if root.val - root.right.val == 1:
+                inc = max(inc, r[0] + 1)
+            elif root.right.val - root.val == 1:
+                dcr = max(dcr, r[1] + 1)
+
+        max_n[0] = max(max_n[0], inc + dcr - 1)
+        return (inc, dcr)
+
+"""
+298. Binary Tree Longest Consecutive Sequence
+
+Given a binary tree, find the length of the longest consecutive sequence path.
+
+The path refers to any sequence of nodes from some starting node to any node in the tree along the 
+parent-child connections. The longest consecutive path need to be from parent to child (cannot be the 
+reverse).
+
+Example 1:
+
+Input:
+
+   1
+    \
+     3
+    / \
+   2   4
+        \
+         5
+
+Output: 3
+Explanation: Longest consecutive sequence path is 3-4-5, so return 3.
+
+Example 2:
+
+Input:
+
+   2
+    \
+     3
+    / 
+   2    
+  / 
+ 1
+
+Output: 2 
+Explanation: Longest consecutive sequence path is 2-3, not 3-2-1, so return 2.
+"""
+
+# Definition for a binary tree node.
+# class TreeNode:
+#     def __init__(self, x):
+#         self.val = x
+#         self.left = None
+#         self.right = None
+class Solution:
+    def longestConsecutive(self, root):
+        """
+        :type root: TreeNode
+        :rtype: int
+        """
+        if root is None:
+            return 0
+        return self.find_longest(root, root.val, -sys.maxsize - 1)
+        
+    def find_longest(self, root, prev, n):
+        if root is None: 
+            return n
+        
+        next_n = n + 1
+        if root.val - prev != 1:
+            next_n = 1
+        
+        left = self.find_longest(root.left, root.val, next_n)
+        right = self.find_longest(root.right, root.val, next_n)
+        return max(n, max(left, right))
 
 """
 129. Sum Root to Leaf Numbers

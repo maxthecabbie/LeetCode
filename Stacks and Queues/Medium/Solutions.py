@@ -17,17 +17,17 @@ class Solution:
         :type temperatures: List[int]
         :rtype: List[int]
         """
+        res = [0 for _ in range(len(temperatures))]
         stack = []
-        result = [0 for _ in range(len(temperatures))]
         
         for i in range(len(temperatures)):
-            temp = temperatures[i]
-            while len(stack) > 0 and temp > stack[-1][0]:
-                day = stack.pop()
-                result[day[1]] = i - day[1]
-            stack.append([temp, i])
+            t = temperatures[i]
+            while stack and t > stack[-1][1]:
+                day = stack.pop()[0]
+                res[day] = i - day
+            stack.append((i, t))
         
-        return result
+        return res
 
 """
 503. Next Greater Element II
@@ -54,14 +54,15 @@ class Solution:
         :rtype: List[int]
         """
         res = [-1 for _ in range(len(nums))]
-        s = []
+        stack = []
         
         for _ in range(2):
             for i in range(len(nums)):
-                while len(s) > 0 and s[-1][0] < nums[i]:
-                    waiting = s.pop()
-                    res[waiting[1]] = nums[i]
-                s.append([nums[i], i])
+                while stack and nums[i] > stack[-1][1]:
+                    waiting = stack.pop()
+                    res[waiting[0]] = nums[i]
+                stack.append((i, nums[i]))
+        
         return res
 
 """
@@ -118,15 +119,13 @@ prep_next in the init function and after every next call
 #        :rtype List[NestedInteger]
 #        """
 class NestedIterator(object):
-
     def __init__(self, nestedList):
         """
         Initialize your data structure here.
         :type nestedList: List[NestedInteger]
         """
         self.stack = []
-        
-        for i in range(len(nestedList) - 1, -1, -1):
+        for i in range(len(nestedList) -1, -1, -1):
             self.stack.append(nestedList[i])
         self.prep_next()
 
@@ -134,24 +133,23 @@ class NestedIterator(object):
         """
         :rtype: int
         """
-        next_int = self.stack.pop().getInteger()
-        
-        if self.hasNext():
+        n = self.stack.pop()
+        if self.hasNext:
             self.prep_next()
-        return next_int
+        return n.getInteger()
 
     def hasNext(self):
         """
         :rtype: bool
         """
-        return len(self.stack) > 0
+        return self.stack
     
     def prep_next(self):
         while self.hasNext() and not self.stack[-1].isInteger():
             nested_list = self.stack.pop().getList()
             for i in range(len(nested_list) - 1, -1, -1):
                 self.stack.append(nested_list[i])
-
+            
 # Your NestedIterator object will be instantiated and called as such:
 # i, v = NestedIterator(nestedList), []
 # while i.hasNext(): v.append(i.next())
@@ -221,6 +219,69 @@ class Solution:
                 i += 1
                 
         return "".join(buffer)
+
+"""
+853. Car Fleet
+
+N cars are going to the same destination along a one lane road.  The destination is target miles away.
+
+Each car i has a constant speed speed[i] (in miles per hour), and initial position position[i] miles towards 
+the target along the road.
+
+A car can never pass another car ahead of it, but it can catch up to it, and drive bumper to bumper at the 
+same speed.
+
+The distance between these two cars is ignored - they are assumed to have the same position.
+
+A car fleet is some non-empty set of cars driving at the same position and same speed.  Note that a single 
+car is also a car fleet.
+
+If a car catches up to a car fleet right at the destination point, it will still be considered as one car 
+fleet.
+
+How many car fleets will arrive at the destination?
+
+Example 1:
+Input: target = 12, position = [10,8,0,5,3], speed = [2,4,1,1,3]
+Output: 3
+Explanation:
+The cars starting at 10 and 8 become a fleet, meeting each other at 12.
+The car starting at 0 doesn't catch up to any other car, so it is a fleet by itself.
+The cars starting at 5 and 3 become a fleet, meeting each other at 6.
+Note that no other cars meet these fleets before the destination, so the answer is 3.
+
+Note:
+0 <= N <= 10 ^ 4
+0 < target <= 10 ^ 6
+0 < speed[i] <= 10 ^ 6
+0 <= position[i] < target
+All initial positions are different.
+"""
+
+class Solution:
+    def carFleet(self, target, position, speed):
+        """
+        :type target: int
+        :type position: List[int]
+        :type speed: List[int]
+        :rtype: int
+        """
+        fin = []
+        count = 0
+        
+        for i in range(len(position)):
+            finish = (target - position[i])/speed[i]
+            fin.append((position[i], finish))
+        fin.sort(key = lambda x: x[0])
+
+        while len(fin) > 0:
+            car = fin.pop()
+            
+            while len(fin) > 0 and fin[-1][1] <= car[1]:
+                fin.pop()
+            count += 1
+            
+        return count
 
 """
 150. Evaluate Reverse Polish Notation
@@ -308,17 +369,132 @@ class Solution:
         """
         stack = []
         for i in range(len(num)):
-            c = num[i]
-            while len(stack) > 0 and stack[-1] > c and k > 0:
+            while stack and stack[-1] > num[i] and k > 0:
                 stack.pop()
                 k -= 1
-            stack.append(c)
-            
-        keep = len(stack) - k
-        stack = stack[0:keep]
-        i = 0
+            stack.append(num[i])
         
+        i = 0
+        last = len(stack) - k
         while i < len(stack) and stack[i] == "0":
             i += 1
             
-        return "0" if i == len(stack) else "".join(stack[i:])
+        return "".join(stack[i:last]) if i < last else "0"
+
+"""
+353. Design Snake Game
+
+Design a Snake game that is played on a device with screen size = width x height. Play the game online if 
+you are not familiar with the game.
+
+The snake is initially positioned at the top left corner (0,0) with length = 1 unit.
+
+You are given a list of food's positions in row-column order. When a snake eats the food, its length and the 
+game's score both increase by 1.
+
+Each food appears one by one on the screen. For example, the second food will not appear until the first 
+food was eaten by the snake.
+
+When a food does appear on the screen, it is guaranteed that it will not appear on a block occupied by the 
+snake.
+
+Example:
+Given width = 3, height = 2, and food = [[1,2],[0,1]].
+
+Snake snake = new Snake(width, height, food);
+
+Initially the snake appears at position (0,0) and the food at (1,2).
+
+|S| | |
+| | |F|
+
+snake.move("R"); -> Returns 0
+
+| |S| |
+| | |F|
+
+snake.move("D"); -> Returns 0
+
+| | | |
+| |S|F|
+
+snake.move("R"); -> Returns 1 (Snake eats the first food and right after that, the second food appears at (
+0,1) )
+
+| |F| |
+| |S|S|
+
+snake.move("U"); -> Returns 1
+
+| |F|S|
+| | |S|
+
+snake.move("L"); -> Returns 2 (Snake eats the second food)
+
+| |S|S|
+| | |S|
+
+snake.move("U"); -> Returns -1 (Game over because snake collides with border)
+"""
+
+class SnakeGame:
+    def __init__(self, width, height, food):
+        """
+        Initialize your data structure here.
+        @param width - screen width
+        @param height - screen height 
+        @param food - A list of food positions
+        E.g food = [[1,1], [1,0]] means the first food is positioned at [1,1], the second is at [1,0].
+        :type width: int
+        :type height: int
+        :type food: List[List[int]]
+        """
+        self.snake = collections.deque()
+        self.body = set()
+        self.snake.append((0,0))
+        self.body.add(str(0) + ":" + str(0))
+        
+        self.h = height
+        self.w = width
+        self.food = food
+        self.score = 0
+        
+    def move(self, direction):
+        """
+        Moves the snake.
+        @param direction - 'U' = Up, 'L' = Left, 'R' = Right, 'D' = Down 
+        @return The game's score after the move. Return -1 if game over. 
+        Game over when snake crosses the screen boundary or bites its body.
+        :type direction: str
+        :rtype: int
+        """
+        pos = self.snake[0]
+        fpos = self.food[self.score] if self.score < len(self.food) else None
+        dirs = {
+            "U": (-1, 0),
+            "D": (1, 0),
+            "L": (0, -1),
+            "R": (0, 1)
+        }
+        r, c = pos[0] + dirs[direction][0], pos[1] + dirs[direction][1]
+        key = str(r) + ":" + str(c)
+        
+        if r < 0 or r >= self.h or c < 0 or c >= self.w or key in self.body \
+        and (r, c) != self.snake[-1]:
+            return -1
+        elif fpos and r == fpos[0] and c == fpos[1]:
+            self.snake.appendleft((r, c))
+            self.body.add(key)
+            self.score += 1
+            return self.score
+        else:
+            self.snake.appendleft((r, c))
+            last = self.snake.pop()
+            last_key = str(last[0]) + ":" + str(last[1])
+            self.body.remove(last_key)
+            self.body.add(key)
+            return self.score
+        
+# Your SnakeGame object will be instantiated and called as such:
+# obj = SnakeGame(width, height, food)
+# param_1 = obj.move(direction)

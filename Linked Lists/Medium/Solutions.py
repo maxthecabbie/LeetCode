@@ -14,8 +14,34 @@ Input:
 
 Output:
 1->2->4
+"""
 
-Solution Explanation
+class Solution(object):
+    def plusOne(self, head):
+        """
+        :type head: ListNode
+        :rtype: ListNode
+        """
+        cursor = head
+        stack = []
+        
+        while cursor:
+            stack.append(cursor)
+            cursor = cursor.next
+        
+        while stack:
+            node = stack.pop()
+            if node.val < 9:
+                node.val += 1
+                return head
+            node.val = 0
+        
+        new_head = ListNode(1)
+        new_head.next = head
+        return new_head
+
+# Alternative O(1) space solution
+"""
 - To do this in place, iterate through the linked list and keep track of the last node in the list that has a
 value that is not 9
 - If non_nine None, that means all the nodes have a val of 9. We must add a new head with a val of 0, which 
@@ -24,7 +50,6 @@ will later get 1 added to the val
 - Iterate through the linked list starting at non_nine.next setting the val of each encountered node to 0
 - Return the head
 """
-
 class Solution(object):
     def plusOne(self, head):
         """
@@ -106,17 +131,16 @@ class Solution:
         :type G: List[int]
         :rtype: int
         """
-        gset = set(G)
         count = 0
+        gset = set(G)
         cursor = head
         
         while cursor:
             if cursor.val in gset:
-                while cursor and cursor.val in gset:
+                while cursor.next and cursor.next.val in gset:
                     cursor = cursor.next
                 count += 1
-            else:
-                cursor = cursor.next
+            cursor = cursor.next
         
         return count
 
@@ -201,6 +225,10 @@ The first node is considered odd, the second node even and so on ...
 #         self.next = None
 class Solution:
     def oddEvenList(self, head):
+        """
+        :type head: ListNode
+        :rtype: ListNode
+        """
         dummy_odd = odd = ListNode(0)
         dummy_even = even = ListNode(0)
         
@@ -209,7 +237,7 @@ class Solution:
             even.next = head.next
             odd = odd.next
             even = even.next
-            head = head.next.next if even else None
+            head = head.next.next if head.next else head.next
             
         odd.next = dummy_even.next
         return dummy_odd.next
@@ -305,34 +333,27 @@ class Solution:
         :type l2: ListNode
         :rtype: ListNode
         """
-        c1 = l1
-        c2 = l2
+        dummy_head = cursor = ListNode(0)
         carry = 0
-        dummy = ListNode(0)
-        cursor = dummy
         
-        while c1 or c2 or carry > 0:
-            new_node = ListNode(0)
-            val = carry
+        while l1 or l2 or carry:
+            sum_nodes = carry
+            carry = 0
             
-            if c1:
-                val += c1.val
-                c1 = c1.next
-            if c2:
-                val += c2.val
-                c2 = c2.next
-            
-            if val > 9:
+            if l1:
+                sum_nodes += l1.val
+                l1 = l1.next
+            if l2:
+                sum_nodes += l2.val
+                l2 = l2.next
+            if sum_nodes > 9:
                 carry = 1
-                val = val % 10
-            else:
-                carry = 0
+                sum_nodes = sum_nodes % 10
+            
+            cursor.next = ListNode(sum_nodes)
+            cursor = cursor.next
         
-            new_node.val = val
-            cursor.next = new_node
-            cursor = new_node
-        
-        return dummy.next
+        return dummy_head.next
 
 """
 138. Copy List with Random Pointer
@@ -353,29 +374,24 @@ class Solution(object):
         :type head: RandomListNode
         :rtype: RandomListNode
         """
-        if head is None:
-            return None
-        
+        dummy_head = cursor = RandomListNode(0)
         nodes = {}
-        cursor = head
-        dummy_head = RandomListNode(0)
-        cpy_cursor = dummy_head
         
-        while cursor:
-            cpy_node = nodes.get(cursor, RandomListNode(cursor.label))
-            cpy_node.random = None
+        while head:
+            cpy = nodes.get(head, RandomListNode(head.label))
+            cpy.random = None
             
-            if cursor.random in nodes:
-                cpy_node.random = nodes[cursor.random]
-            elif cursor.random:
-                cpy_node.random = RandomListNode(cursor.random.label)
-                
-            nodes[cursor] = cpy_node
-            if cursor.random:
-                nodes[cursor.random] = cpy_node.random
+            if head.random in nodes:
+                cpy.random = nodes[head.random]
+            elif head.random:
+                cpy.random = RandomListNode(head.random.label)
             
-            cpy_cursor.next = cpy_node
-            cpy_cursor = cpy_cursor.next
+            nodes[head] = cpy
+            if head.random:
+                nodes[head.random] = cpy.random
+            
+            head = head.next
+            cursor.next = cpy
             cursor = cursor.next
         
         return dummy_head.next
@@ -433,23 +449,20 @@ class Solution(object):
             new_node.next = new_node
             return new_node
         
-        prev = head
-        cur = head.next
+        cursor = head.next
         
-        while True:
-            if insertVal >= prev.val and insertVal <= cur.val:
-                break
-            elif prev.val > cur.val and (insertVal >= prev.val or\
-            insertVal <= cur.val):
-                break
-            elif cur == head: break
-            prev = prev.next
-            cur = cur.next
+        while not self.between(cursor.val, cursor.next.val, insertVal) \
+        and cursor is not head:
+            cursor = cursor.next
         
-        new_node = Node(insertVal, cur)
-        prev.next = new_node
-        
+        node = Node(insertVal, cursor.next)
+        cursor.next = node
         return head
+        
+    def between(self, lo, hi, t):
+        if lo <= hi:
+            return lo <= t <= hi
+        return t >= lo or t <= hi
     
         
         

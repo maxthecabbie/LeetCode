@@ -69,6 +69,84 @@ class Solution:
         return len(word1) - longest_subsequence + len(word2) - longest_subsequence
 
 """
+638. Shopping Offers
+
+In LeetCode Store, there are some kinds of items to sell. Each item has a price.
+
+However, there are some special offers, and a special offer consists of one or more different kinds of items 
+with a sale price.
+
+You are given the each item's price, a set of special offers, and the number we need to buy for each item. 
+The job is to output the lowest price you have to pay for exactly certain items as given, where you could 
+make optimal use of the special offers.
+
+Each special offer is represented in the form of an array, the last number represents the price you need to 
+pay for this special offer, other numbers represents how many specific items you could get if you buy this 
+offer.
+
+You could use any of special offers as many times as you want.
+
+Example 1:
+Input: [2,5], [[3,0,5],[1,2,10]], [3,2]
+Output: 14
+Explanation: 
+There are two kinds of items, A and B. Their prices are $2 and $5 respectively. 
+In special offer 1, you can pay $5 for 3A and 0B
+In special offer 2, you can pay $10 for 1A and 2B. 
+You need to buy 3A and 2B, so you may pay $10 for 1A and 2B (special offer #2), and $4 for 2A.
+
+Example 2:
+Input: [2,3,4], [[1,1,0,4],[2,2,1,9]], [1,2,1]
+Output: 11
+Explanation: 
+The price of A is $2, and $3 for B, $4 for C. 
+You may pay $4 for 1A and 1B, and $9 for 2A ,2B and 1C. 
+You need to buy 1A ,2B and 1C, so you may pay $4 for 1A and 1B (special offer #1), and $3 for 1B, $4 for 1C. 
+You cannot add more items, though only $9 for 2A ,2B and 1C.
+
+Note:
+There are at most 6 kinds of items, 100 special offers.
+For each item, you need to buy at most 6 of them.
+You are not allowed to buy more items than you want, even if that would lower the overall price.
+"""
+
+class Solution:
+    def shoppingOffers(self, price, special, needs):
+        """
+        :type price: List[int]
+        :type special: List[List[int]]
+        :type needs: List[int]
+        :rtype: int
+        """
+        return self.shop_helper(price, special, needs, {})
+        
+    def shop_helper(self, price, special, needs, cache):
+        if sum(needs) == 0:
+            return 0
+        
+        key = str(needs)
+        if cache.get(key, None):
+            return cache[key]
+        
+        new_needs = [n-1 if n > 0 else n for n in needs]
+        cost = sum([price[i] for i in range(len(needs)) if needs[i] > 0])
+        cache[key] = cost + self.shop_helper(price, special, new_needs, cache)
+        
+        for s in special:
+            if self.can_special(s, needs):
+                new_needs = [needs[i] - s[i] for i in range(len(needs))]
+                cost = s[-1] + self.shop_helper(price, special, new_needs, cache)
+                cache[key] = min(cache[key], cost)
+                
+        return cache[key]
+        
+    def can_special(self, special, needs):
+        for i in range(len(needs)):
+            if needs[i] < special[i]:
+                return False
+        return True
+
+"""
 62. Unique Paths
 
 A robot is located at the top-left corner of a m x n grid (marked 'Start' in the diagram below).
@@ -148,123 +226,62 @@ class Solution:
         :rtype: int
         """
         cache = [[-1 for _ in range(len(grid[0]))] for _ in range(len(grid))]
-        return self.path_helper(0, 0, 0, grid, cache)
+        return self.path_helper(0, 0, grid, cache)
         
     
-    def path_helper(self, i, j, total, grid, cache):
+    def path_helper(self, i, j, grid, cache):
         if i >= len(grid) or j >= len(grid[0]):
             return sys.maxsize
-
-        if cache[i][j] != -1:
-            return cache[i][j]
         
         val = grid[i][j]
         if i == len(grid) - 1 and j == len(grid[0]) - 1:
-            return total + val
-
-        down = val + self.path_helper(i+1, j, total, grid, cache)
-        right = val + self.path_helper(i, j+1, total, grid, cache)
-        cache[i][j] = min(down, right)
+            return val
+        
+        if cache[i][j] != -1:
+            return cache[i][j]
+        
+        cache[i][j] = val + min(self.path_helper(i+1, j, grid, cache),\
+                                self.path_helper(i, j+1, grid, cache))
         return cache[i][j]
 
 """
-62. Unique Paths
+247. Strobogrammatic Number II
 
-A robot is located at the top-left corner of a m x n grid (marked 'Start' in the diagram below).
+A strobogrammatic number is a number that looks the same when rotated 180 degrees (looked at upside down).
 
-The robot can only move either down or right at any point in time. The robot is trying to reach the 
-bottom-right corner of the grid (marked 'Finish' in the diagram below).
-
-How many possible unique paths are there?
-
-https://leetcode.com/problems/unique-paths/description/
-Above is a 7 x 3 grid. How many possible unique paths are there?
-
-Note: m and n will be at most 100.
-
-Example 1:
-Input: m = 3, n = 2
-Output: 3
-Explanation:
-From the top-left corner, there are a total of 3 ways to reach the bottom-right corner:
-1. Right -> Right -> Down
-2. Right -> Down -> Right
-3. Down -> Right -> Right
-
-Example 2:
-Input: m = 7, n = 3
-Output: 28
-"""
-
-class Solution:
-    def uniquePaths(self, m, n):
-        """
-        :type m: int
-        :type n: int
-        :rtype: int
-        """
-        moves = [[None for j in range(m)] for i in range(n)]
-        return self.helper(m, n, 0, 0, moves)
-    
-    def uniquePaths_helper(self, m, n, r, c, moves):
-        if r >= n or c >= m:
-            return 0
-        
-        if moves[r][c] is not None:
-            return moves[r][c]
-        
-        if r == n - 1 and c == m - 1:
-            return 1
-        
-        right = self.helper(m, n, r, c+1, moves)
-        down = self.helper(m, n, r+1, c, moves)
-        
-        moves[r][c] = right + down
-        return moves[r][c]
-
-"""
-64. Minimum Path Sum
-
-Given a m x n grid filled with non-negative numbers, find a path from top left to bottom right which 
-minimizes the sum of all numbers along its path.
-
-Note: You can only move either down or right at any point in time.
+Find all strobogrammatic numbers that are of length = n.
 
 Example:
-Input:
-[
-  [1,3,1],
-  [1,5,1],
-  [4,2,1]
-]
-Output: 7
-Explanation: Because the path 1→3→1→1→1 minimizes the sum.
+Input:  n = 2
+Output: ["11","69","88","96"]
 """
 
 class Solution:
-    def minPathSum(self, grid):
+    def findStrobogrammatic(self, n):
         """
-        :type grid: List[List[int]]
-        :rtype: int
+        :type n: int
+        :rtype: List[str]
         """
-        cache = [[-1 for _ in range(len(grid[0]))] for _ in range(len(grid))]
-        return self.path_helper(0, 0, 0, grid, cache)
+        return self.helper(n, True)
+
+    def helper(self, n, first):
+        if n == 0:
+            return [""]
+        if n == 1:
+            return ["1", "8", "0"]
         
-    
-    def path_helper(self, i, j, total, grid, cache):
-        if i >= len(grid) or j >= len(grid[0]):
-            return sys.maxsize
+        mid = self.helper(n-2, False)
+        result = []
         
-        val = grid[i][j]
-        if i == len(grid) - 1 and j == len(grid[0]) - 1:
-            return total + val
+        for n in mid:
+            if not first:
+                result.append("0" + n + "0")
+            result.append("1" + n + "1")
+            result.append("6" + n + "9")
+            result.append("8" + n + "8")
+            result.append("9" + n + "6")
         
-        if cache[i][j] != -1:
-            return cache[i][j]
-        
-        cache[i][j] = val + min(self.path_helper(i+1, j, total, grid, cache),\
-                                self.path_helper(i, j+1, total, grid, cache))
-        return cache[i][j]
+        return result
 
 """
 300. Longest Increasing Subsequence
