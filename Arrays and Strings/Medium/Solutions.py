@@ -13,7 +13,7 @@ URL can be decoded to the original URL.
 
 class Codec:
     def __init__(self):
-    	self.url_mappings = {}
+        self.url_mappings = {}
 
     def encode(self, longUrl):
         """Encodes a URL to a shortened URL.
@@ -474,7 +474,7 @@ Solution Explanation
 chunks variable keeps track of the chunks we can sort so far 
 - At every index in our array, we first update max_num and then check if max_num is less than or equal to 
 the current index
-	- If it is, that means we can make a sorted chunk since the rest of the elements below it are less than 
+    - If it is, that means we can make a sorted chunk since the rest of the elements below it are less than 
     or equal to the max_num, and no number in a higher index is less than max_num. Increase chunks by 1
     - Else, that means max_num is greater than the current index, and we cannot make a sorted chunk since if 
     we make a sorted chunk, then the max_num will not be in the correct index and will be out of place
@@ -642,11 +642,11 @@ numbers coming from the stream as it's too large to hold in memory. Could you so
 Solution Explanation
 - Have 3 variables, max_count, count, and prev
 - Iterate through array:
-	- If value is 1, increase count by 1
-	- If value is 0, update max_count and:
-		- If previous was also a 0, set prev to 0
-		- If previous was not a 0, set prev to count
-		- Set count back to 0 in both cases
+    - If value is 1, increase count by 1
+    - If value is 0, update max_count and:
+        - If previous was also a 0, set prev to 0
+        - If previous was not a 0, set prev to count
+        - Set count back to 0 in both cases
 - Have to be careful to handle the case where entire array is all 1's, in which case we will have an answer 
 that is 1 more than expected
 """
@@ -825,10 +825,10 @@ class Solution:
         slow = nums[0]
 
         while True:
-        	fast = nums[nums[fast]]
-        	slow = nums[slow]
-        	if fast == slow:
-        		break
+            fast = nums[nums[fast]]
+            slow = nums[slow]
+            if fast == slow:
+                break
 
         p1 = nums[0]
         p2 = slow

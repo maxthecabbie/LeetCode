@@ -1131,21 +1131,15 @@ class Solution:
         :type nums: List[int]
         :rtype: int
         """
-        if len(nums) <= 0: 
-            return -1
-        
-        hi = 0 
-        sec_hi = -1
+        hi, hi2 = 0, None
         
         for i in range(1, len(nums)):
             if nums[i] > nums[hi]:
-                sec_hi = hi
-                hi = i
-            elif sec_hi == -1 or nums[i] > nums[sec_hi]:
-                sec_hi = i
-        
-        valid_hi = sec_hi == -1 or nums[hi] >= nums[sec_hi] * 2
-        return hi if valid_hi else -1
+                hi, hi2 = i, hi
+            elif hi2 is None or nums[i] > nums[hi2]:
+                hi2 = i
+                
+        return hi if hi2 is None or nums[hi] >= nums[hi2] * 2 else -1
 
 """
 66. Plus One
