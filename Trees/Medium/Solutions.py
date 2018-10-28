@@ -186,6 +186,64 @@ class Solution:
             result.append(levels[min_level])
             min_level += 1
         return result
+
+"""
+103. Binary Tree Zigzag Level Order Traversal
+
+Given a binary tree, return the zigzag level order traversal of its nodes' values. (ie, from left to right, 
+then right to left for the next level and alternate between).
+
+For example:
+Given binary tree [3,9,20,null,null,15,7],
+    3
+   / \
+  9  20
+    /  \
+   15   7
+return its zigzag level order traversal as:
+[
+  [3],
+  [20,9],
+  [15,7]
+]
+"""
+
+# Definition for a binary tree node.
+# class TreeNode:
+#     def __init__(self, x):
+#         self.val = x
+#         self.left = None
+#         self.right = None
+class Solution:
+    def zigzagLevelOrder(self, root):
+        """
+        :type root: TreeNode
+        :rtype: List[List[int]]
+        """
+        curr = [root] if root else []
+        res = []
+        while curr:
+            next_level = []
+            self.append_curr(curr, res)
+            for i in range(len(curr)):
+                node = curr[i]
+                if node.left:
+                    next_level.append(node.left)
+                if node.right:
+                    next_level.append(node.right)
+            curr = next_level
+        
+        return res
+    
+    def append_curr(self, curr, res):
+        lev = []
+        s = 0 if len(res) % 2 == 0 else len(curr) - 1
+        e = -1 if len(res) % 2 == 1 else len(curr)
+        d = 1 if s < e else -1
+        for i in range(s, e, d):
+            lev.append(curr[i].val)
+        res.append(lev)
+
 """
 450. Delete Node in a BST
 
@@ -883,6 +941,71 @@ class Solution:
         for neighbor in graph.get(node, set()):
             if neighbor not in visited:
                 self.dfs(neighbor, graph, visited)
+
+"""
+116. Populating Next Right Pointers in Each Node
+
+Given a binary tree
+
+struct TreeLinkNode {
+  TreeLinkNode *left;
+  TreeLinkNode *right;
+  TreeLinkNode *next;
+}
+Populate each next pointer to point to its next right node. If there is no next right node, the next pointer 
+should be set to NULL.
+
+Initially, all next pointers are set to NULL.
+
+Note:
+You may only use constant extra space.
+Recursive approach is fine, implicit stack space does not count as extra space for this problem.
+You may assume that it is a perfect binary tree (ie, all leaves are at the same level, and every parent has 
+two children).
+
+Example:
+Given the following perfect binary tree,
+
+     1
+   /  \
+  2    3
+ / \  / \
+4  5  6  7
+After calling your function, the tree should look like:
+
+     1 -> NULL
+   /  \
+  2 -> 3 -> NULL
+ / \  / \
+4->5->6->7 -> NULL
+"""
+
+# Definition for binary tree with next pointer.
+# class TreeLinkNode:
+#     def __init__(self, x):
+#         self.val = x
+#         self.left = None
+#         self.right = None
+#         self.next = None
+class Solution:
+    # @param root, a tree link node
+    # @return nothing
+    def connect(self, root):
+        curr = [root] if root else []
+        
+        while curr:
+            next_level = []
+            
+            for i in range(len(curr) - 1):
+                curr[i].next = curr[i+1]
+            
+            for node in curr:
+                if node.left:
+                    next_level.append(node.left)
+                if node.right:
+                    next_level.append(node.right)
+                    
+            curr = next_level
 
 """
 285. Inorder Successor in BST
