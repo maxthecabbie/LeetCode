@@ -103,6 +103,55 @@ class Solution:
         return str(result).replace(" ", "")
 
 """
+986. Interval List Intersections
+
+Given two lists of closed intervals, each list of intervals is pairwise disjoint and in sorted order.
+
+Return the intersection of these two interval lists.
+
+(Formally, a closed interval [a, b] (with a <= b) denotes the set of real numbers x with a <= x <= b.  The
+intersection of two closed intervals is a set of real numbers that is either empty, or can be represented as
+a closed interval.  For example, the intersection of [1, 3] and [2, 4] is [2, 3].)
+
+Example 1:
+https://leetcode.com/problems/interval-list-intersections/
+
+Input: A = [[0,2],[5,10],[13,23],[24,25]], B = [[1,5],[8,12],[15,24],[25,26]]
+Output: [[1,2],[5,5],[8,10],[15,23],[24,24],[25,25]]
+
+Reminder: The inputs and the desired output are lists of Interval objects, and not arrays or lists.
+ 
+Note:
+0 <= A.length < 1000
+0 <= B.length < 1000
+0 <= A[i].start, A[i].end, B[i].start, B[i].end < 10^9
+"""
+
+class Solution(object):
+    def intervalIntersection(self, A, B):
+        """
+        :type A: List[List[int]]
+        :type B: List[List[int]]
+        :rtype: List[List[int]]
+        """
+        res = []
+        
+        i, j = 0, 0
+        
+        while i < len(A) and j < len(B):
+            if A[i][0] <= B[j][1] and A[i][1] >= B[j][0]:
+                start = max(A[i][0], B[j][0])
+                end = min(A[i][1], B[j][1])
+                res.append([start, end])
+            
+            if A[i][1] <= B[j][1]:
+                i += 1
+            else:
+                j += 1
+        
+        return res
+
+"""
 531. Lonely Pixel I
 
 Given a picture consisting of black and white pixels, find the number of black lonely pixels.
@@ -156,6 +205,55 @@ class Solution:
                     count += 1
         
         return count
+
+"""
+647. Palindromic Substrings
+
+Given a string, your task is to count how many palindromic substrings in this string.
+
+The substrings with different start indexes or end indexes are counted as different substrings even they
+consist of same characters.
+
+Example 1:
+Input: "abc"
+Output: 3
+Explanation: Three palindromic strings: "a", "b", "c".
+ 
+
+Example 2:
+Input: "aaa"
+Output: 6
+Explanation: Six palindromic strings: "a", "a", "a", "aa", "aa", "aaa".
+ 
+Note:
+The input string length won't exceed 1000.
+"""
+class Solution(object):
+    def countSubstrings(self, s):
+        """
+        :type s: str
+        :rtype: int
+        """
+        n = 0
+        
+        for i in range(len(s)):
+            n += self.get_palindromes(i, i, s)
+            n += self.get_palindromes(i, i+1, s)
+        
+        return n
+    
+    def get_palindromes(self, i, j, s):
+        n = 0
+        
+        while i >= 0 and j < len(s):
+            if s[i] != s[j]:
+                break
+            
+            n += 1
+            i -= 1
+            j += 1
+        
+        return n
 
 """
 451. Sort Characters By Frequency
@@ -969,6 +1067,62 @@ class Solution(object):
         return max_size
 
 """
+435. Non-overlapping Intervals
+
+Given a collection of intervals, find the minimum number of intervals you need to remove to make the rest of
+the intervals non-overlapping.
+
+Note:
+You may assume the interval's end point is always bigger than its start point.
+Intervals like [1,2] and [2,3] have borders "touching" but they don't overlap each other.
+
+Example 1:
+
+Input: [ [1,2], [2,3], [3,4], [1,3] ]
+
+Output: 1
+
+Explanation: [1,3] can be removed and the rest of intervals are non-overlapping.
+ 
+Example 2:
+
+Input: [ [1,2], [1,2], [1,2] ]
+
+Output: 2
+
+Explanation: You need to remove two [1,2] to make the rest of intervals non-overlapping.
+ 
+Example 3:
+Input: [ [1,2], [2,3] ]
+
+Output: 0
+
+Explanation: You don't need to remove any of the intervals since they're already non-overlapping.
+"""
+
+class Solution(object):
+    def eraseOverlapIntervals(self, intervals):
+        """
+        :type intervals: List[List[int]]
+        :rtype: int
+        """
+        remove = 0
+        
+        if not intervals:
+            return remove
+        
+        intervals.sort(key = lambda x: x[1])
+        last_end = intervals[0][0]
+        
+        for i in intervals:
+            if i[0] < last_end:
+                remove += 1
+            else:
+                last_end = i[1]
+        
+        return remove
+
+"""
 48. Rotate Image
 
 You are given an n x n 2D matrix representing an image.
@@ -1644,6 +1798,62 @@ class Solution:
         return count
 
 """
+424. Longest Repeating Character Replacement
+
+Given a string that consists of only uppercase English letters, you can replace any letter in the string with
+another letter at most k times. Find the length of a longest substring containing all repeating letters you
+can get after performing the above operations.
+
+Note:
+Both the string's length and k will not exceed 104.
+
+Example 1:
+Input:
+s = "ABAB", k = 2
+
+Output:
+4
+
+Explanation:
+Replace the two 'A's with two 'B's or vice versa.
+
+Example 2:
+Input:
+s = "AABABBA", k = 1
+
+Output:
+4
+
+Explanation:
+Replace the one 'A' in the middle with 'B' and form "AABBBBA".
+The substring "BBBB" has the longest repeating letters, which is 4.
+"""
+class Solution(object):
+    def characterReplacement(self, s, k):
+        """
+        :type s: str
+        :type k: int
+        :rtype: int
+        """
+        max_len = 0
+        max_count = 0
+        l = r = 0
+        counts = collections.defaultdict(int)
+        
+        while r < len(s):
+            counts[s[r]] += 1
+            max_count = max(max_count, counts[s[r]])
+            
+            while r - l + 1 > max_count + k:
+                counts[s[l]] -= 1
+                l += 1
+            
+            max_len = max(max_len, r - l + 1)
+            r += 1
+            
+        return max_len
+
+"""
 731. My Calendar II
 
 Implement a MyCalendarTwo class to store your events. A new event can be added if adding the event will not 
@@ -1871,6 +2081,57 @@ class Solution:
         return "".join(result)
 
 """
+621. Task Scheduler
+
+Given a char array representing tasks CPU need to do. It contains capital letters A to Z where different
+letters represent different tasks. Tasks could be done without original order. Each task could be done in one
+interval. For each interval, CPU could finish one task or just be idle.
+
+However, there is a non-negative cooling interval n that means between two same tasks, there must be at least
+n intervals that CPU are doing different tasks or just be idle.
+
+You need to return the least number of intervals the CPU will take to finish all the given tasks.
+
+Example:
+Input: tasks = ["A","A","A","B","B","B"], n = 2
+Output: 8
+Explanation: A -> B -> idle -> A -> B -> idle -> A -> B.
+ 
+Note:
+The number of tasks is in the range [1, 10000].
+The integer n is in the range [0, 100].
+"""
+
+class Solution(object):
+    def leastInterval(self, tasks, n):
+        """
+        :type tasks: List[str]
+        :type n: int
+        :rtype: int
+        """
+        time = 0
+        counts = [0 for _ in range(26)]
+        
+        for t in tasks:
+            counts[ord(t) - ord("A")] += 1
+        
+        counts.sort(key = lambda x: -x)
+        
+        while counts[0] != 0:
+            done = 0
+            for i in range(min(len(counts), n+1)):
+                if counts[i] == 0:
+                    break
+                    
+                done += 1
+                counts[i] -= 1
+            
+            time += done if counts[0] == 0 else n+1
+            counts.sort(key = lambda x: -x)
+        
+        return time
+
+"""
 289. Game of Life
 
 According to the Wikipedia's article: "The Game of Life, also known simply as Life, is a cellular automaton 
@@ -2018,6 +2279,52 @@ class Solution:
         return "".join(result)
 
 """
+153. Find Minimum in Rotated Sorted Array
+
+Suppose an array sorted in ascending order is rotated at some pivot unknown to you beforehand.
+
+(i.e.,  [0,1,2,4,5,6,7] might become  [4,5,6,7,0,1,2]).
+
+Find the minimum element.
+
+You may assume no duplicate exists in the array.
+
+Example 1:
+Input: [3,4,5,1,2] 
+Output: 1
+
+Example 2:
+Input: [4,5,6,7,0,1,2]
+Output: 0
+"""
+class Solution(object):
+    def findMin(self, nums):
+        """
+        :type nums: List[int]
+        :rtype: int
+        """
+        lo, hi = 0, len(nums) - 1
+        min_num = sys.maxsize
+        
+        while lo <= hi:
+            mid = (lo + hi) // 2
+            
+            min_num = min(min_num, nums[mid])
+            
+            if self.go_right(lo, hi, mid, nums):
+                lo = mid + 1
+            else:
+                hi = mid - 1
+        
+        return min_num
+    
+    def go_right(self, lo, hi, mid, nums):
+        if mid > 0:
+            return nums[mid-1] > nums[hi] and nums[hi] < nums[lo]
+        
+        return nums[hi] < nums[lo]
+
+"""
 809. Expressive Words
 
 Sometimes people repeat letters to represent extra feeling, such as "hello" -> "heeellooo", "hi" -> 
@@ -2079,6 +2386,63 @@ class Solution:
             e1, w1 = e2, w2
 
         return e1 >= len(e) and w1 >= len(w)
+
+"""
+103. Binary Tree Zigzag Level Order Traversal
+
+Given a binary tree, return the zigzag level order traversal of its nodes' values. (ie, from left to right,
+then right to left for the next level and alternate between).
+
+For example:
+Given binary tree [3,9,20,null,null,15,7],
+    3
+   / \
+  9  20
+    /  \
+   15   7
+
+return its zigzag level order traversal as:
+[
+  [3],
+  [20,9],
+  [15,7]
+]
+"""
+
+# Definition for a binary tree node.
+# class TreeNode(object):
+#     def __init__(self, x):
+#         self.val = x
+#         self.left = None
+#         self.right = None
+class Solution(object):
+    def zigzagLevelOrder(self, root):
+        """
+        :type root: TreeNode
+        :rtype: List[List[int]]
+        """
+        res = []
+        prev = [root] if root else []
+        i = 0
+        
+        while prev:
+            curr = []
+            
+            for node in prev:
+                if node.left:
+                    curr.append(node.left)
+                if node.right:
+                    curr.append(node.right)
+            
+            if i % 2 != 0:
+                res.append([node.val for node in prev[::-1]])
+            else:
+                res.append([node.val for node in prev])
+            
+            prev = curr
+            i += 1
+        
+        return res
 
 """
 17. Letter Combinations of a Phone Number
@@ -2706,6 +3070,74 @@ class Solution:
             j -= 1
 
 """
+277. Find the Celebrity
+
+Suppose you are at a party with n people (labeled from 0 to n - 1) and among them, there may exist one
+celebrity. The definition of a celebrity is that all the other n - 1 people know him/her but he/she does not
+know any of them.
+
+Now you want to find out who the celebrity is or verify that there is not one. The only thing you are allowed
+to do is to ask questions like: "Hi, A. Do you know B?" to get information of whether A knows B. You need to
+find out the celebrity (or verify there is not one) by asking as few questions as possible(in the asymptotic
+sense).
+
+You are given a helper function bool knows(a, b) which tells you whether A knows B. Implement a function int
+findCelebrity(n). There will be exactly one celebrity if he/she is in the party. Return the celebrity's label
+if there is a celebrity in the party. If there is no celebrity, return -1.
+
+Example 1:
+https://leetcode.com/problems/find-the-celebrity/
+Input: graph = [
+  [1,1,0],
+  [0,1,0],
+  [1,1,1]
+]
+Output: 1
+
+Explanation: There are three persons labeled with 0, 1 and 2. graph[i][j] = 1 means person i knows person j,
+otherwise graph[i][j] = 0 means person i does not know person j. The celebrity is the person labeled as 1
+because both 0 and 2 know him but 1 does not know anybody.
+
+Example 2:
+https://leetcode.com/problems/find-the-celebrity/
+Input: graph = [
+  [1,0,1],
+  [1,1,0],
+  [0,1,1]
+]
+Output: -1
+
+Explanation: There is no celebrity.
+ 
+Note:
+The directed graph is represented as an adjacency matrix, which is an n x n matrix where a[i][j] = 1 means person i knows person j while a[i][j] = 0 means the contrary.
+Remember that you won't have direct access to the adjacency matrix.
+"""
+
+# The knows API is already defined for you.
+# @param a, person a
+# @param b, person b
+# @return a boolean, whether a knows b
+# def knows(a, b):
+class Solution(object):
+    def findCelebrity(self, n):
+        """
+        :type n: int
+        :rtype: int
+        """
+        celeb = 0
+        
+        for i in range(1, n):
+            if knows(celeb, i):
+                celeb = i
+        
+        for i in range(n):
+            if i != celeb and (knows(celeb, i) or not knows(i, celeb)):
+                return -1
+        
+        return celeb
+
+"""
 522. Longest Uncommon Subsequence II
 
 Given a list of strings, you need to find the longest uncommon subsequence among them. The longest uncommon 
@@ -3080,44 +3512,48 @@ Input:
 Output: [1,2,3,4,8,12,11,10,9,5,6,7]
 """
 
-class Solution:
+class Solution(object):
     def spiralOrder(self, matrix):
         """
         :type matrix: List[List[int]]
         :rtype: List[int]
         """
-        if len(matrix) <= 0:
-            return []
+        res = []
         
-        result = []
+        if not matrix:
+            return res
         
-        layers = int(math.ceil(min(len(matrix), len(matrix[0]))/2))
-        x_len = len(matrix[0])
-        y_len = len(matrix) - 2
-        x_end = len(matrix[0]) - 1
-        y_end = len(matrix) - 1
+        row_begin = 0
+        row_end = len(matrix) - 1
         
-        for i in range(layers):
-            for j in range(x_len):
-                result.append(matrix[i][i+j])
+        col_begin = 0
+        col_end = len(matrix[0]) - 1
+        
+        while row_begin <= row_end and col_begin <= col_end:
             
-            for j in range(y_len):
-                result.append(matrix[i+1+j][x_end])
+            for col in range(col_begin, col_end + 1):
+                res.append(matrix[row_begin][col])
             
-            if i != y_end:
-                for j in range(x_len):
-                    result.append(matrix[y_end][x_end-j])
-                    
-            if i != x_end:
-                for j in range(y_len):
-                    result.append(matrix[y_end-1-j][i])
+            row_begin += 1
             
-            x_len -= 2
-            y_len -= 2
-            x_end -= 1
-            y_end -= 1
+            for row in range(row_begin, row_end + 1):
+                res.append(matrix[row][col_end])
+            
+            col_end -= 1
+            
+            if row_begin <= row_end:
+                for col in range(col_end, col_begin - 1, -1):
+                    res.append(matrix[row_end][col])
+            
+            row_end -= 1
+            
+            if col_begin <= col_end:
+                for row in range(row_end, row_begin - 1, -1):
+                    res.append(matrix[row][col_begin])
+            
+            col_begin += 1
         
-        return result
+        return res
 
 """
 271. Encode and Decode Strings
@@ -3242,6 +3678,42 @@ class Solution:
             i -= 1
             j += 1
         return s[i+1:j]
+
+"""
+152. Maximum Product Subarray
+
+Given an integer array nums, find the contiguous subarray within an array (containing at least one number)
+which has the largest product.
+
+Example 1:
+Input: [2,3,-2,4]
+Output: 6
+Explanation: [2,3] has the largest product 6.
+
+Example 2:
+Input: [-2,0,-1]
+Output: 0
+Explanation: The result cannot be 2, because [-2,-1] is not a subarray.
+"""
+
+class Solution(object):
+    def maxProduct(self, nums):
+        """
+        :type nums: List[int]
+        :rtype: int
+        """
+        max_prod = nums[0]
+        curr_min = curr_max = nums[0]
+        
+        for i in range(1, len(nums)):
+            n = nums[i]
+            temp_min = curr_min
+            
+            curr_min = min(n, n * curr_min, n * curr_max)
+            curr_max = max(n, n * temp_min, n * curr_max)
+            max_prod = max(max_prod, curr_max)
+        
+        return max_prod
 
 """
 3. Longest Substring Without Repeating Characters

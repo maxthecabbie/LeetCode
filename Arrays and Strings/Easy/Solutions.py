@@ -145,6 +145,57 @@ class Solution:
         return "".join([alphabet[ord(c) - ord("a")] for c in word])
 
 """
+929. Unique Email Addresses
+
+Every email consists of a local name and a domain name, separated by the @ sign.
+
+For example, in alice@leetcode.com, alice is the local name, and leetcode.com is the domain name.
+
+Besides lowercase letters, these emails may contain '.'s or '+'s.
+
+If you add periods ('.') between some characters in the local name part of an email address, mail sent there
+will be forwarded to the same address without dots in the local name.  For example, "alice.z@leetcode.com"
+and "alicez@leetcode.com" forward to the same email address.  (Note that this rule does not apply for domain
+names.)
+
+If you add a plus ('+') in the local name, everything after the first plus sign will be ignored. This allows
+certain emails to be filtered, for example m.y+name@email.com will be forwarded to my@email.com.  (Again,
+this rule does not apply for domain names.)
+
+It is possible to use both of these rules at the same time.
+
+Given a list of emails, we send one email to each address in the list.  How many different addresses actually
+receive mails? 
+
+Example 1:
+Input: ["test.email+alex@leetcode.com","test.e.mail+bob.cathy@leetcode.com","testemail+david@lee.tcode.com"]
+Output: 2
+Explanation: "testemail@leetcode.com" and "testemail@lee.tcode.com" actually receive mails
+
+
+Note:
+1 <= emails[i].length <= 100
+1 <= emails.length <= 100
+Each emails[i] contains exactly one '@' character.
+"""
+
+class Solution(object):
+    def numUniqueEmails(self, emails):
+        """
+        :type emails: List[str]
+        :rtype: int
+        """
+        email_set = {self.convert(email) for email in emails}
+        return len(email_set)
+    
+    def convert(self, email):
+        parts = email.split("@")
+        local, domain = parts[0], parts[1]
+        local = local.split("+")[0]
+        local = local.replace(".", "")
+        return local + "@" + domain
+
+"""
 832. Flipping an Image
 
 Given a binary matrix A, we want to flip the image horizontally, then invert it, and return the resulting 
@@ -657,6 +708,54 @@ Input: [2,2,1,1,1,2,2]
 Output: 2
 """
 
+"""
+13. Roman to Integer
+
+Roman numerals are represented by seven different symbols: I, V, X, L, C, D and M.
+
+Symbol       Value
+I             1
+V             5
+X             10
+L             50
+C             100
+D             500
+M             1000
+For example, two is written as II in Roman numeral, just two one's added together. Twelve is written as, XII,
+which is simply X + II. The number twenty seven is written as XXVII, which is XX + V + II.
+
+Roman numerals are usually written largest to smallest from left to right. However, the numeral for four is
+not IIII. Instead, the number four is written as IV. Because the one is before the five we subtract it making
+four. The same principle applies to the number nine, which is written as IX. There are six instances where
+subtraction is used:
+
+I can be placed before V (5) and X (10) to make 4 and 9. 
+X can be placed before L (50) and C (100) to make 40 and 90. 
+C can be placed before D (500) and M (1000) to make 400 and 900.
+Given a roman numeral, convert it to an integer. Input is guaranteed to be within the range from 1 to 3999.
+
+Example 1:
+Input: "III"
+Output: 3
+
+Example 2:
+Input: "IV"
+Output: 4
+
+Example 3:
+Input: "IX"
+Output: 9
+
+Example 4:
+Input: "LVIII"
+Output: 58
+Explanation: L = 50, V= 5, III = 3.
+
+Example 5:
+Input: "MCMXCIV"
+Output: 1994
+Explanation: M = 1000, CM = 900, XC = 90 and IV = 4.
+"""
 class Solution:
     def majorityElement(self, nums):
         """
@@ -672,6 +771,43 @@ class Solution:
         for k in freq:
             if freq[k] > target: 
                 return k
+
+class Solution(object):
+    def romanToInt(self, s):
+        """
+        :type s: str
+        :rtype: int
+        """
+        nums = {
+            "I": 1,
+            "V": 5,
+            "X": 10,
+            "L": 50,
+            "C": 100,
+            "D": 500,
+            "M": 1000
+        }
+        
+        rules = {
+            "IV": 4,
+            "IX": 9,
+            "XL": 40,
+            "XC": 90,
+            "CD": 400,
+            "CM": 900
+        }
+        
+        total = 0
+
+        for i in range(len(s)):
+            if i-1 >=0 and nums[s[i-1]] < nums[s[i]]:
+                n = s[i-1] + s[i]
+                total = total - nums[s[i-1]] + rules[n]
+            else:
+                total += nums[s[i]]
+            
+        return total
+
 """
 349. Intersection of Two Arrays
 
@@ -983,6 +1119,43 @@ class Solution:
         return "".join(res)
 
 """
+118. Pascal's Triangle
+
+Given a non-negative integer numRows, generate the first numRows of Pascal's triangle.
+
+https://leetcode.com/problems/pascals-triangle/
+
+Example:
+Input: 5
+Output:
+[
+     [1],
+    [1,1],
+   [1,2,1],
+  [1,3,3,1],
+ [1,4,6,4,1]
+]
+"""
+class Solution(object):
+    def generate(self, numRows):
+        """
+        :type numRows: int
+        :rtype: List[List[int]]
+        """
+        result = []
+        
+        for i in range(numRows):
+            next_row = [0 for _ in range(i+1)]
+            next_row[0], next_row[-1] = 1, 1
+            
+            for j in range(1, i):
+                next_row[j] = result[-1][j-1] + result[-1][j]
+                
+            result.append(next_row)
+            
+        return result
+
+"""
 350. Intersection of Two Arrays II
 
 Given two arrays, write a function to compute their intersection.
@@ -1218,6 +1391,41 @@ class Solution:
         return [-1, -1]
 
 """
+119. Pascal's Triangle II
+Given a non-negative index k where k ≤ 33, return the kth index row of the Pascal's triangle.
+
+Note that the row index starts from 0.
+
+https://leetcode.com/problems/pascals-triangle-ii/
+
+Example:
+Input: 3
+Output: [1,3,3,1]
+
+Follow up:
+Could you optimize your algorithm to use only O(k) extra space?
+"""
+class Solution(object):
+    def getRow(self, rowIndex):
+        """
+        :type rowIndex: int
+        :rtype: List[int]
+        """
+        return self.pascals_impl(0, rowIndex, [1])
+        
+    def pascals_impl(self, i, n, last):
+        if i >= n:
+            return last
+        
+        new_row = [None for _ in range(i+2)]
+        new_row[0], new_row[-1] = 1, 1
+        
+        for j in range(1, len(new_row) - 1):
+            new_row[j] = last[j-1] + last[j]
+        
+        return self.pascals_impl(i+1, n, new_row)
+
+"""
 643. Maximum Average Subarray I
 
 Given an array consisting of n integers, find the contiguous subarray of given length k that has the maximum 
@@ -1247,6 +1455,49 @@ class Solution:
                 curr += (nums[k+i]) - (nums[i])
                 hi = max(hi, curr)
         return hi/min(k, len(nums))
+
+"""
+303. Range Sum Query - Immutable
+
+Given an integer array nums, find the sum of the elements between indices i and j (i ≤ j), inclusive.
+
+Example:
+Given nums = [-2, 0, 3, -5, 2, -1]
+
+sumRange(0, 2) -> 1
+sumRange(2, 5) -> -1
+sumRange(0, 5) -> -3
+
+Note:
+You may assume that the array does not change.
+There are many calls to sumRange function.
+
+"""
+class NumArray(object):
+    def __init__(self, nums):
+        """
+        :type nums: List[int]
+        """
+        self.sum = []
+        cu_sum = 0
+        
+        for i in range(len(nums)):
+            self.sum.append(cu_sum + nums[i])
+            cu_sum += nums[i]
+        
+
+    def sumRange(self, i, j):
+        """
+        :type i: int
+        :type j: int
+        :rtype: int
+        """
+        if i == 0:
+            return self.sum[j]
+        return self.sum[j] - self.sum[i-1]
+# Your NumArray object will be instantiated and called as such:
+# obj = NumArray(nums)
+# param_1 = obj.sumRange(i,j)
 
 """
 26. Remove Duplicates from Sorted Array
@@ -1610,26 +1861,25 @@ class Solution:
         :type k: int
         :rtype: void Do not return anything, modify nums in-place instead.
         """
-        if len(nums) == 0 or k == 0: 
+        if not nums: 
             return
         
-        k = k % len(nums)
-        count = 0
         start = 0
+        prev_idx = 0
+        prev_val = nums[0]
         
-        while count < len(nums):
-            current = start
-            prev = nums[start]
-            while True:
-                nxt = (current + k) % len(nums)
-                temp = nums[nxt]
-                nums[nxt] = prev
-                prev = temp
-                current = nxt
-                count += 1
-                if current == start:
-                    break
-            start += 1
+        for _ in range(len(nums)):
+            next_idx = (prev_idx + k) % len(nums)
+            temp = nums[next_idx]
+            nums[next_idx] = prev_val
+            prev_idx = next_idx
+            prev_val = temp
+            
+            if prev_idx == start:
+                prev_idx = (prev_idx + 1) % len(nums)
+                prev_val = nums[prev_idx]
+                start = prev_idx
+        
 
 """
 665. Non-decreasing Array

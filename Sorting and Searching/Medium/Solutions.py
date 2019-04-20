@@ -69,6 +69,125 @@ class Solution:
         
         return result
 
+# Alternative solution using bucket sort
+class Solution(object):
+    def topKFrequent(self, nums, k):
+        """
+        :type nums: List[int]
+        :type k: int
+        :rtype: List[int]
+        """
+        res = []
+        counts = collections.Counter(nums)
+        counts_arr = [[counts[n], n] for n in counts]
+        self.bucket_sort(counts_arr)
+        
+        for i in range(k):
+            res.append(counts_arr[~i][1])
+        
+        return res
+    
+    def bucket_sort(self, arr):
+        if not arr:
+            return arr
+        
+        min_n = max_n = arr[0][0]
+        
+        for entry in arr:
+            min_n = min(min_n, entry[0])
+            max_n = max(max_n, entry[0])
+        
+        buckets = [[] for _ in range((max_n - min_n) + 1)]
+        
+        for entry in arr:
+            buckets[entry[0] - min_n].append(entry)
+        
+        i = 0
+        for b in buckets:
+            for entry in b:
+                arr[i] = entry
+                i += 1
+
+"""
+911. Online Election
+
+In an election, the i-th vote was cast for persons[i] at time times[i].
+
+Now, we would like to implement the following query function: TopVotedCandidate.q(int t) will return the
+number of the person that was leading the election at time t.  
+
+Votes cast at time t will count towards our query.  In the case of a tie, the most recent vote (among tied
+candidates) wins.
+
+Example 1:
+Input: ["TopVotedCandidate","q","q","q","q","q","q"], [[[0,1,1,0,0,1,0],[0,5,10,15,20,25,30]],[3],[12],[25],
+[15],[24],[8]]
+Output: [null,0,1,1,0,0,1]
+
+Explanation: 
+At time 3, the votes are [0], and 0 is leading.
+At time 12, the votes are [0,1,1], and 1 is leading.
+At time 25, the votes are [0,1,1,0,0,1], and 1 is leading (as ties go to the most recent vote.)
+This continues for 3 more queries at time 15, 24, and 8.
+ 
+Note:
+1 <= persons.length = times.length <= 5000
+0 <= persons[i] <= persons.length
+times is a strictly increasing array with all elements in [0, 10^9].
+TopVotedCandidate.q is called at most 10000 times per test case.
+TopVotedCandidate.q(int t) is always called with t >= times[0].
+"""
+
+class TopVotedCandidate(object):
+    def __init__(self, persons, times):
+        """
+        :type persons: List[int]
+        :type times: List[int]
+        """
+        self.leads = [persons[0]] if persons else []
+        self.times = times
+        counts = collections.defaultdict(int)
+        
+        if persons:
+            counts[persons[0]] += 1
+        
+        for i in range(1, len(persons)):
+            p = persons[i]
+            counts[p] += 1
+            
+            lead = self.leads[i-1]
+            if counts[p] >= counts[lead]:
+                lead = p
+
+            self.leads.append(lead)
+        
+
+    def q(self, t):
+        """
+        :type t: int
+        :rtype: int
+        """
+        lead_idx = self.search(t)
+        return self.leads[lead_idx]
+    
+    def search(self, t):
+        lo, hi = 0, len(self.times) - 1
+        result = -1
+        
+        while lo <= hi:
+            mid = (lo + hi) // 2
+            
+            if t >= self.times[mid]:
+                result = mid
+                lo = mid + 1
+            else:
+                hi = mid - 1
+        
+        return result
+# Your TopVotedCandidate object will be instantiated and called as such:
+# obj = TopVotedCandidate(persons, times)
+# param_1 = obj.q(t)
+
 """
 524. Longest Word in Dictionary through Deleting
 
@@ -490,3 +609,166 @@ class Solution:
                 lo = mid + 1
         
         return lo
+
+# Alternative solution that is much easier to understand
+class Solution(object):
+    def searchRange(self, nums, target):
+        """
+        :type nums: List[int]
+        :type target: int
+        :rtype: List[int]
+        """
+        
+        left = self.search(nums, target, True)
+        right = self.search(nums, target, False)
+        return [left, right]
+    
+    def search(self, nums, target, left):
+        lo, hi = 0, len(nums) - 1
+        result = -1
+        
+        while lo <= hi:
+            mid = (lo + hi) // 2
+            
+            if nums[mid] == target:
+                result = mid
+                if left:
+                    hi = mid - 1
+                else:
+                    lo = mid + 1
+            elif nums[mid] < target:
+                lo = mid + 1
+            else:
+                hi = mid - 1
+        
+        return result
+
+"""
+34. Find First and Last Position of Element in Sorted Array
+
+Given an array of integers nums sorted in ascending order, find the starting and ending position of a given
+target value.
+
+Your algorithm's runtime complexity must be in the order of O(log n).
+
+If the target is not found in the array, return [-1, -1].
+
+Example 1:
+Input: nums = [5,7,7,8,8,10], target = 8
+Output: [3,4]
+
+Example 2:
+Input: nums = [5,7,7,8,8,10], target = 6
+Output: [-1,-1]
+"""
+
+class Solution(object):
+    def wiggleSort(self, nums):
+        """
+        :type nums: List[int]
+        :rtype: None Do not return anything, modify nums in-place instead.
+        """
+        sorted_nums = sorted(nums)
+        curr = len(sorted_nums) - 1
+        
+        for i in range(1, len(nums), 2):
+            nums[i] = sorted_nums[curr]
+            curr -= 1
+        
+        for i in range(0, len(nums), 2):
+            nums[i] = sorted_nums[curr]
+            curr -= 1
+
+"""
+179. Largest Number
+
+Given a list of non negative integers, arrange them such that they form the largest number.
+
+Example 1:
+Input: [10,2]
+Output: "210"
+
+Example 2:
+Input: [3,30,34,5,9]
+Output: "9534330"
+
+Note: The result may be very large, so you need to return a string instead of an integer.
+"""
+
+class Solution(object):
+    def largestNumber(self, nums):
+        """
+        :type nums: List[int]
+        :rtype: str
+        """
+        nums = [str(n) for n in nums]
+        nums.sort(self.cmp_nums)
+        res = "".join(nums)
+        return res if not res.startswith("0") else "0"
+    
+    def cmp_nums(self, n1, n2):
+        concat1 = n1 + n2
+        concat2 = n2 + n1
+        
+        if concat1 > concat2:
+            return -1
+        elif concat1 < concat2:
+            return 1
+        return 0
+
+"""
+29. Divide Two Integers
+
+Given two integers dividend and divisor, divide two integers without using multiplication, division and mod
+operator.
+
+Return the quotient after dividing dividend by divisor.
+
+The integer division should truncate toward zero.
+
+Example 1:
+Input: dividend = 10, divisor = 3
+Output: 3
+
+Example 2:
+Input: dividend = 7, divisor = -3
+Output: -2
+
+Note:
+Both dividend and divisor will be 32-bit signed integers.
+The divisor will never be 0.
+Assume we are dealing with an environment which could only store integers within the 32-bit signed integer
+range: [−231,  231 − 1]. For the purpose of this problem, assume that your function returns 231 − 1 when the
+division result overflows.
+"""
+
+class Solution(object):
+    def divide(self, dividend, divisor):
+        """
+        :type dividend: int
+        :type divisor: int
+        :rtype: int
+        """   
+        res = 0
+        
+        is_pos = True
+        if (dividend < 0 and divisor > 0) or (dividend > 0 and divisor < 0):
+            is_pos = False
+        
+        dividend, divisor = abs(dividend), abs(divisor)
+        curr, count = divisor, 1
+        
+        while dividend >= divisor:
+            while dividend < curr:
+                curr >>= 1
+                count >>= 1
+            
+            dividend -= curr
+            res += count
+            curr <<= 1
+            count <<= 1
+        
+        if not is_pos:
+            res = -res
+        
+        return min(2**31 - 1, max(-2**31, res))

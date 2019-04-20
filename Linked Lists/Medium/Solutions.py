@@ -145,6 +145,50 @@ class Solution:
         return count
 
 """
+24. Swap Nodes in Pairs
+
+Given a linked list, swap every two adjacent nodes and return its head.
+
+You may not modify the values in the list's nodes, only nodes itself may be changed.
+ 
+Example:
+Given 1->2->3->4, you should return the list as 2->1->4->3.
+"""
+# Definition for singly-linked list.
+# class ListNode(object):
+#     def __init__(self, x):
+#         self.val = x
+#         self.next = None
+
+class Solution(object):
+    def swapPairs(self, head):
+        """
+        :type head: ListNode
+        :rtype: ListNode
+        """
+        return self.swap_impl(head, None)
+        
+    def swap_impl(self, head, prev):
+        if head is None:
+            return
+        
+        if head.next:
+            temp = head.next.next
+            after_head = head.next
+            
+            after_head.next = head
+            if prev:
+                prev.next = after_head
+            
+            head.next = temp
+            
+            self.swap_impl(temp, head)
+            
+            head = after_head
+            
+        return head
+
+"""
 19. Remove Nth Node From End of List
 
 Given a linked list, remove the n-th node from the end of list and return its head.
@@ -307,6 +351,60 @@ class Solution:
         return dummy.next
 
 """
+143. Reorder List
+
+Given a singly linked list L: L0→L1→…→Ln-1→Ln,
+reorder it to: L0→Ln→L1→Ln-1→L2→Ln-2→…
+
+You may not modify the values in the list's nodes, only nodes itself may be changed.
+
+Example 1:
+Given 1->2->3->4, reorder it to 1->4->2->3.
+
+Example 2:
+Given 1->2->3->4->5, reorder it to 1->5->2->4->3.
+"""
+
+# Definition for singly-linked list.
+# class ListNode(object):
+#     def __init__(self, x):
+#         self.val = x
+#         self.next = None
+class Solution(object):
+    def reorderList(self, head):
+        """
+        :type head: ListNode
+        :rtype: None Do not return anything, modify head in-place instead.
+        """
+        if head is None:
+            return head
+        
+        fast = slow = head
+        stack = []
+        
+        while fast and fast.next:
+            fast = fast.next.next
+            slow = slow.next
+        
+        if fast:
+            slow = slow.next
+        
+        while slow:
+            stack.append(slow)
+            slow = slow.next
+        
+        cursor = head
+        
+        while stack:
+            temp = cursor.next
+            stack[-1].next = temp
+            cursor.next = stack.pop()
+            cursor = temp
+        
+        cursor.next = None
+        return head
+
+"""
 2. Add Two Numbers
 
 You are given two non-empty linked lists representing two non-negative integers. The digits are stored in 
@@ -371,28 +469,26 @@ node in the list or null. Return a deep copy of the list.
 class Solution(object):
     def copyRandomList(self, head):
         """
-        :type head: RandomListNode
-        :rtype: RandomListNode
+        :type head: Node
+        :rtype: Node
         """
-        dummy_head = cursor = RandomListNode(0)
-        nodes = {}
+        dummy_head = cursor = Node(-1, None, None)
+        seen = {}
         
         while head:
-            cpy = nodes.get(head, RandomListNode(head.label))
-            cpy.random = None
+            copy = seen[head] if head in seen else Node(head.val, None, None)
+            seen[head] = copy
             
-            if head.random in nodes:
-                cpy.random = nodes[head.random]
-            elif head.random:
-                cpy.random = RandomListNode(head.random.label)
+            if head.random in seen:
+                copy.random = seen[head.random]
+            elif head.random is not None:
+                node = Node(head.random.val, None, None)
+                seen[head.random] = node
+                copy.random = node
             
-            nodes[head] = cpy
-            if head.random:
-                nodes[head.random] = cpy.random
-            
-            head = head.next
-            cursor.next = cpy
+            cursor.next = copy
             cursor = cursor.next
+            head = head.next
         
         return dummy_head.next
 

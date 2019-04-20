@@ -1,4 +1,78 @@
 """
+979. Distribute Coins in Binary Tree
+
+Given the root of a binary tree with N nodes, each node in the tree has node.val coins, and there are N coins
+total.
+
+In one move, we may choose two adjacent nodes and move one coin from one node to another.  (The move may be
+from parent to child, or from child to parent.)
+
+Return the number of moves required to make every node have exactly one coin.
+
+https://leetcode.com/problems/distribute-coins-in-binary-tree/
+
+Example 1:
+Input: [3,0,0]
+Output: 2
+Explanation: From the root of the tree, we move one coin to its left child, and one coin to its right child.
+
+Example 2:
+Input: [0,3,0]
+Output: 3
+Explanation: From the left child of the root, we move two coins to the root [taking two moves].  Then, we
+move one coin from the root of the tree to the right child.
+
+Example 3:
+Input: [1,0,2]
+Output: 2
+
+Example 4:
+Input: [1,0,0,null,3]
+Output: 4
+
+Note:
+1<= N <= 100
+0 <= node.val <= N
+"""
+
+# Definition for a binary tree node.
+# class TreeNode(object):
+#     def __init__(self, x):
+#         self.val = x
+#         self.left = None
+#         self.right = None
+class Solution(object):
+    def distributeCoins(self, root):
+        """
+        :type root: TreeNode
+        :rtype: int
+        """
+        return self.distribute_coins_impl(root)[1]
+    
+    def distribute_coins_impl(self, root):
+        if root is None:
+            return (0, 0)
+
+        left = self.distribute_coins_impl(root.left)
+        right = self.distribute_coins_impl(root.right)
+        
+        child_coins = left[0] + right[0]
+        moves = left[1] + right[1]
+        
+        coins = child_coins - (root.val - 1)
+        if coins == 0:
+            return (0, moves)
+        elif coins < 0:
+            give = (root.val - 1) - child_coins
+            moves += give
+            return (-give, moves)
+        else:
+            need = child_coins - (root.val - 1)
+            moves += need
+            return (need, moves)
+        
+
+"""
 729. My Calendar I
 
 Implement a MyCalendar class to store your events. A new event can be added if adding the event will not 
@@ -186,6 +260,55 @@ class Solution:
             result.append(levels[min_level])
             min_level += 1
         return result
+
+"""
+105. Construct Binary Tree from Preorder and Inorder Traversal
+
+Given preorder and inorder traversal of a tree, construct the binary tree.
+
+Note:
+You may assume that duplicates do not exist in the tree.
+
+For example, given
+
+preorder = [3,9,20,15,7]
+inorder = [9,3,15,20,7]
+Return the following binary tree:
+
+    3
+   / \
+  9  20
+    /  \
+   15   7
+"""
+
+# Definition for a binary tree node.
+# class TreeNode(object):
+#     def __init__(self, x):
+#         self.val = x
+#         self.left = None
+#         self.right = None
+class Solution(object):
+    def buildTree(self, preorder, inorder):
+        """
+        :type preorder: List[int]
+        :type inorder: List[int]
+        :rtype: TreeNode
+        """
+        inorder_map = {inorder[i] : i for i in range(len(inorder))}
+        preorder.reverse()
+        return self.build_tree_impl(preorder, inorder_map, 0, len(inorder) - 1)
+    
+    def build_tree_impl(self, preorder, inorder_map, left, right):
+        if left <= right:
+            root = TreeNode(preorder.pop())
+            root_idx = inorder_map[root.val]
+            
+            root.left = self.build_tree_impl(preorder, inorder_map, left, root_idx - 1)
+            root.right = self.build_tree_impl(preorder, inorder_map, root_idx + 1, right)
+            
+            return root
+
 """
 450. Delete Node in a BST
 
@@ -354,6 +477,70 @@ class Solution:
             cursor = cursor.right
         
         return res
+
+"""
+144. Binary Tree Preorder Traversal
+
+Given a binary tree, return the preorder traversal of its nodes' values.
+
+Example:
+Input: [1,null,2,3]
+   1
+    \
+     2
+    /
+   3
+
+Output: [1,2,3]
+
+Follow up: Recursive solution is trivial, could you do it iteratively?
+
+"""
+# Definition for a binary tree node.
+# class TreeNode(object):
+#     def __init__(self, x):
+#         self.val = x
+#         self.left = None
+#         self.right = None
+class Solution(object):
+    def preorderTraversal(self, root):
+        """
+        :type root: TreeNode
+        :rtype: List[int]
+        """
+        nodes = []
+        self.preorder(root, nodes)
+        return nodes
+    
+    def preorder(self, root, nodes):
+        if root is None:
+            return
+        nodes.append(root.val)
+        self.preorder(root.left, nodes)
+        self.preorder(root.right, nodes)
+
+# Alternative solution using a stack
+class Solution(object):
+    def preorderTraversal(self, root):
+        """
+        :type root: TreeNode
+        :rtype: List[int]
+        """
+        if root is None:
+            return []
+        
+        nodes = []
+        stack = [root]
+        
+        while stack:
+            node = stack.pop()
+            nodes.append(node.val)
+            if node.right:
+                stack.append(node.right)
+            if node.left:
+                stack.append(node.left)
+        
+        return nodes
 
 """
 230. Kth Smallest Element in a BST

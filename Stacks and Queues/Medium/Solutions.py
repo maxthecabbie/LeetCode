@@ -284,6 +284,73 @@ class Solution:
         return count
 
 """
+227. Basic Calculator II
+
+Implement a basic calculator to evaluate a simple expression string.
+
+The expression string contains only non-negative integers, +, -, *, / operators and empty spaces . The
+integer division should truncate toward zero.
+
+Example 1:
+Input: "3+2*2"
+Output: 7
+
+Example 2:
+Input: " 3/2 "
+Output: 1
+
+Example 3:
+Input: " 3+5 / 2 "
+Output: 5
+
+Note:
+You may assume that the given expression is always valid.
+Do not use the eval built-in library function.
+"""
+
+class Solution(object):
+    def calculate(self, s):
+        """
+        :type s: str
+        :rtype: int
+        """
+        stack = []
+        
+        i = 0
+        while i < len(s):
+            if s[i].isdigit():
+                num, idx = self.get_digit(i, s)
+                stack.append(num)
+                i = idx
+            elif s[i] == "+":
+                i += 1
+            elif s[i] == "-":
+                num, idx = self.get_digit(i+1, s)
+                stack.append(-num)
+                i = idx
+            elif s[i] == "*":
+                num, idx = self.get_digit(i+1, s)
+                stack[-1] *= num
+                i = idx
+            elif:
+                num, idx = self.get_digit(i+1, s)
+                if stack[-1] < 0:
+                    stack[-1] = -(-stack[-1]//num)
+                else:
+                    stack[-1] = stack[-1] // num
+                i = idx
+            else:
+                i += 1
+                
+        return sum(stack)
+    
+    def get_digit(self, i, s):
+        j = i
+        while j < len(s) and s[j].isdigit():
+            j += 1
+        return (int(s[i:j]), j)
+
+"""
 150. Evaluate Reverse Polish Notation
 
 Evaluate the value of an arithmetic expression in Reverse Polish Notation.

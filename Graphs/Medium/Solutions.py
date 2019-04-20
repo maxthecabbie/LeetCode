@@ -68,6 +68,63 @@ class Solution:
         return len(rooms) == len(vis)
 
 """
+947. Most Stones Removed with Same Row or Column
+
+On a 2D plane, we place stones at some integer coordinate points.  Each coordinate point may have at most one
+stone.
+
+Now, a move consists of removing a stone that shares a column or row with another stone on the grid.
+
+What is the largest possible number of moves we can make?
+
+Example 1:
+Input: stones = [[0,0],[0,1],[1,0],[1,2],[2,1],[2,2]]
+Output: 5
+
+Example 2:
+Input: stones = [[0,0],[0,2],[1,1],[2,0],[2,2]]
+Output: 3
+
+Example 3:
+Input: stones = [[0,0]]
+Output: 0
+"""
+
+class Solution(object):
+    def removeStones(self, stones):
+        """
+        :type stones: List[List[int]]
+        :rtype: int
+        """
+        moves = 0
+        graph = collections.defaultdict(set)
+        vis = set()
+        
+        for i in range(len(stones)):
+            for j in range(len(stones)):
+                x, y = stones[i], stones[j]
+                
+                if i != j and (x[0] == y[0] or x[1] == y[1]):
+                    graph[i].add(j)
+                    graph[j].add(i)
+        
+        for node in graph:
+            if node not in vis:
+                moves += self.dfs(node, graph, vis) - 1
+        
+        return moves
+    
+    def dfs(self, root, graph, vis):
+        num_nodes = 1
+        vis.add(root)
+        
+        for node in graph[root]:
+            if node not in vis:
+                num_nodes += self.dfs(node, graph, vis)
+        
+        return num_nodes
+
+"""
 323. Number of Connected Components in an Undirected Graph
 
 Given n nodes labeled from 0 to n - 1 and a list of undirected edges (each edge is a pair of nodes), write a 
@@ -105,32 +162,34 @@ edges
 - Return count
 """
 
-class Solution:
+class Solution(object):
     def countComponents(self, n, edges):
         """
         :type n: int
         :type edges: List[List[int]]
         :rtype: int
         """
-        nodes = {i for i in range(0, n)}
-        graph = {}
-        
-        for e in edges:
-            graph.setdefault(e[0], set()).add(e[1])
-            graph.setdefault(e[1], set()).add(e[0])
-
         count = 0
-        while len(nodes) > 0:
-            start = nodes.pop()
-            self.dfs(start, graph, nodes)
-            count += 1
+        
+        graph = {node: set() for node in range(n)}
+        for e in edges:
+            graph[e[0]].add(e[1])
+            graph[e[1]].add(e[0])
+            
+        vis = set()
+        for node in range(n):
+            if node not in vis:
+                self.dfs(node, graph, vis)
+                count += 1
+        
         return count
-
-    def dfs(self, n, graph, nodes):
-        for neighbor in graph.get(n, set()):
-            if neighbor in nodes:
-                nodes.remove(neighbor)
-                self.dfs(neighbor, graph, nodes)
+    
+    def dfs(self, root, graph, vis):
+        vis.add(root)
+        
+        for node in graph[root]:
+            if node not in vis:
+                self.dfs(node, graph, vis)
 
 """
 756. Pyramid Transition Matrix
@@ -463,6 +522,66 @@ class Solution(object):
                 self.dfs(grid, r, c)
 
 """
+207. Course Schedule
+
+There are a total of n courses you have to take, labeled from 0 to n-1.
+
+Some courses may have prerequisites, for example to take course 0 you have to first take course 1, which is
+expressed as a pair: [0,1]
+
+Given the total number of courses and a list of prerequisite pairs, is it possible for you to finish all
+courses?
+
+Example 1:
+Input: 2, [[1,0]] 
+Output: true
+Explanation: There are a total of 2 courses to take. 
+             To take course 1 you should have finished course 0. So it is possible.
+
+Example 2:
+Input: 2, [[1,0],[0,1]]
+Output: false
+Explanation: There are a total of 2 courses to take. 
+             To take course 1 you should have finished course 0, and to take course 0 you should
+             also have finished course 1. So it is impossible.
+
+Note:
+The input prerequisites is a graph represented by a list of edges, not adjacency matrices. Read more about
+how a graph is represented.
+
+You may assume that there are no duplicate edges in the input prerequisites.
+"""
+
+class Solution(object):
+    def canFinish(self, numCourses, prerequisites):
+        """
+        :type numCourses: int
+        :type prerequisites: List[List[int]]
+        :rtype: bool
+        """
+        graph = {n : set() for n in range(numCourses)}
+        inc = {n : 0 for n in range(numCourses)}
+        
+        for p in prerequisites:
+            graph[p[1]].add(p[0])
+            inc[p[0]] += 1
+        
+        free_nodes = [node for node in inc if inc[node] == 0]
+        vis = 0
+        
+        while free_nodes:
+            free = free_nodes.pop()
+            
+            for node in graph[free]:
+                inc[node] -= 1
+                if inc[node] == 0:
+                    free_nodes.append(node)
+            
+            vis += 1
+        
+        return vis == numCourses
+
+"""
 417. Pacific Atlantic Water Flow
 
 Given an m x n matrix of non-negative integers representing the height of each unit cell in a continent, the 
@@ -552,7 +671,65 @@ class Solution:
                 if 0 <= r < len(matrix) and 0 <= c < len(matrix[0]) \
                 and matrix[r][c] >= matrix[i][j] and not ocean[r][c]:
                     q.put((r, c))
+
+"""
+210. Course Schedule II
+
+There are a total of n courses you have to take, labeled from 0 to n-1.
+
+Some courses may have prerequisites, for example to take course 0 you have to first take course 1, which is expressed as a pair: [0,1]
+
+Given the total number of courses and a list of prerequisite pairs, return the ordering of courses you should take to finish all courses.
+
+There may be multiple correct orders, you just need to return one of them. If it is impossible to finish all courses, return an empty array.
+
+Example 1:
+
+Input: 2, [[1,0]] 
+Output: [0,1]
+Explanation: There are a total of 2 courses to take. To take course 1 you should have finished   
+             course 0. So the correct course order is [0,1] .
+Example 2:
+
+Input: 4, [[1,0],[2,0],[3,1],[3,2]]
+Output: [0,1,2,3] or [0,2,1,3]
+Explanation: There are a total of 4 courses to take. To take course 3 you should have finished both     
+             courses 1 and 2. Both courses 1 and 2 should be taken after you finished course 0. 
+             So one correct course order is [0,1,2,3]. Another correct ordering is [0,2,1,3] .
+Note:
+
+The input prerequisites is a graph represented by a list of edges, not adjacency matrices. Read more about how a graph is represented.
+You may assume that there are no duplicate edges in the input prerequisites.
+"""
+
+class Solution(object):
+    def findOrder(self, numCourses, prerequisites):
+        """
+        :type numCourses: int
+        :type prerequisites: List[List[int]]
+        :rtype: List[int]
+        """
+        res = []
+        graph = {n : set() for n in range(numCourses)}
+        inc = {n : 0 for n in range(numCourses)}
+        
+        for p in prerequisites:
+            graph[p[1]].add(p[0])
+            inc[p[0]] += 1
+        
+        free_nodes = [node for node in inc if inc[node] == 0]
+        
+        while free_nodes:
+            free = free_nodes.pop()
+            res.append(free)
             
+            for node in graph[free]:
+                inc[node] -= 1
+                if inc[node] == 0:
+                    free_nodes.append(node)
+        
+        return res if len(res) == numCourses else []
+   
 """
 542. 01 Matrix
 
@@ -788,4 +965,135 @@ class Solution:
                     q.enqueue([neighbor, neighbor_cpy])
                     
         return cpy
-                
+
+"""
+127. Word Ladder
+
+Given two words (beginWord and endWord), and a dictionary's word list, find the length of shortest
+transformation sequence from beginWord to endWord, such that:
+
+Only one letter can be changed at a time.
+Each transformed word must exist in the word list. Note that beginWord is not a transformed word.
+
+Note:
+Return 0 if there is no such transformation sequence.
+All words have the same length.
+All words contain only lowercase alphabetic characters.
+You may assume no duplicates in the word list.
+You may assume beginWord and endWord are non-empty and are not the same.
+
+Example 1:
+Input:
+beginWord = "hit",
+endWord = "cog",
+wordList = ["hot","dot","dog","lot","log","cog"]
+
+Output: 5
+
+Explanation: As one shortest transformation is "hit" -> "hot" -> "dot" -> "dog" -> "cog",
+return its length 5.
+
+Example 2:
+Input:
+beginWord = "hit"
+endWord = "cog"
+wordList = ["hot","dot","dog","lot","log"]
+
+Output: 0
+
+Explanation: The endWord "cog" is not in wordList, therefore no possible transformation.
+"""
+
+import Queue
+
+class Solution(object):
+    def ladderLength(self, beginWord, endWord, wordList):
+        """
+        :type beginWord: str
+        :type endWord: str
+        :type wordList: List[str]
+        :rtype: int
+        """
+        trans_map = collections.defaultdict(list)
+        
+        for word in wordList:
+            for i in range(len(word)):
+                trans_map[word[:i] + "*" + word[i+1:]].append(word)
+        
+        queue = Queue.Queue()
+        queue.put((beginWord, 1))
+        vis = set([beginWord])
+        
+        while not queue.empty():
+            word, curr_len = queue.get()
+            
+            if word == endWord:
+                return curr_len
+            
+            for i in range(len(word)):
+                for trans in trans_map[word[:i] + "*" + word[i+1:]]:
+                    if trans not in vis:
+                        queue.put((trans, curr_len + 1))
+                        vis.add(trans)
+        
+        return 0
+
+"""
+130. Surrounded Regions
+
+Given a 2D board containing 'X' and 'O' (the letter O), capture all regions surrounded by 'X'.
+
+A region is captured by flipping all 'O's into 'X's in that surrounded region.
+
+Example:
+X X X X
+X O O X
+X X O X
+X O X X
+
+After running your function, the board should be:
+
+X X X X
+X X X X
+X X X X
+X O X X
+
+Explanation:
+Surrounded regions shouldn’t be on the border, which means that any 'O' on the border of the board are not
+flipped to 'X'. Any 'O' that is not on the border and it is not connected to an 'O' on the border will be
+flipped to 'X'. Two cells are connected if they are adjacent cells connected horizontally or vertically.
+"""
+class Solution(object):
+    def solve(self, board):
+        """
+        :type board: List[List[str]]
+        :rtype: None Do not return anything, modify board in-place instead.
+        """
+        if not board:
+            return
+        
+        for i in (0, len(board) - 1):
+            for j in range(len(board[0])):
+                if board[i][j] == "O":
+                    self.dfs(i, j, board)
+
+        for j in (0, len(board[0]) - 1):
+            for i in range(len(board)):
+                if board[i][j] == "O":
+                    self.dfs(i, j, board)
+
+        for i in range(len(board)):
+            for j in range(len(board[0])):
+                if board[i][j] == "O":
+                    board[i][j] = "X"
+                elif board[i][j] == "#":
+                    board[i][j] = "O"
+
+    def dfs(self, i, j, board):
+        if (0 <= i < len(board) and 0 <= j < len(board[0]) and
+            board[i][j] == "O"):
+
+            board[i][j] = "#"
+
+            for r, c in ((i, j-1), (i-1, j), (i, j+1), (i+1, j)):
+                self.dfs(r, c, board)

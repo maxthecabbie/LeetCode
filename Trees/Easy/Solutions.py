@@ -45,6 +45,77 @@ class Solution:
         return t1
 
 """
+589. N-ary Tree Preorder Traversal
+
+Given an n-ary tree, return the preorder traversal of its nodes' values.
+
+For example, given a 3-ary tree:
+https://leetcode.com/problems/n-ary-tree-preorder-traversal/
+ 
+Return its preorder traversal as: [1,3,5,6,2,4].
+
+Note:
+Recursive solution is trivial, could you do it iteratively?
+"""
+# Definition for a Node.
+# class Node(object):
+#     def __init__(self, val, children):
+#         self.val = val
+#         self.children = children
+class Solution:
+    def preorder(self, root: 'Node') -> List[int]:
+        if root is None:
+            return []
+        
+        nodes = []
+        stack = [root]
+
+        while stack:
+            node = stack.pop()
+            nodes.append(node.val)
+            
+            for i in range(len(node.children) - 1, -1, -1):
+                stack.append(node.children[i])
+
+        return nodes 
+        
+"""
+559. Maximum Depth of N-ary Tree
+
+Given a n-ary tree, find its maximum depth.
+
+The maximum depth is the number of nodes along the longest path from the root node down to the farthest leaf node.
+
+For example, given a 3-ary tree:
+https://leetcode.com/problems/maximum-depth-of-n-ary-tree/
+
+We should return its max depth, which is 3.
+
+Note:
+The depth of the tree is at most 1000.
+The total number of nodes is at most 5000.
+"""
+# Definition for a Node.
+# class Node(object):
+#     def __init__(self, val, children):
+#         self.val = val
+#         self.children = children
+class Solution(object):
+    def maxDepth(self, root):
+        """
+        :type root: Node
+        :rtype: int
+        """
+        if root is None:
+            return 0
+        
+        max_child = 0
+        for child in root.children:
+            max_child = max(max_child, self.maxDepth(child))
+        
+        return 1 + max_child
+
+"""
 104. Maximum Depth of Binary Tree
 
 Given a binary tree, find its maximum depth.
@@ -81,6 +152,53 @@ class Solution:
         if root is None: 
             return 0
         return max(1 + self.maxDepth(root.left), 1 + self.maxDepth(root.right))
+
+"""
+429. N-ary Tree Level Order Traversal
+
+Given an n-ary tree, return the level order traversal of its nodes' values. (ie, from left to right, level by
+level).
+
+For example, given a 3-ary tree:
+https://leetcode.com/problems/n-ary-tree-level-order-traversal/
+
+We should return its level order traversal:
+[
+     [1],
+     [3,2,4],
+     [5,6]
+]
+ 
+Note:
+The depth of the tree is at most 1000.
+The total number of nodes is at most 5000.
+"""
+# Definition for a Node.
+# class Node(object):
+#     def __init__(self, val, children):
+#         self.val = val
+#         self.children = children
+class Solution(object):
+    def levelOrder(self, root):
+        """
+        :type root: Node
+        :rtype: List[List[int]]
+        """
+        levels = []
+        prev = [root] if root is not None else []
+        
+        while prev:
+            curr_level = []
+            next_level = []
+            for node in prev:
+                curr_level.append(node.val)
+                for child in node.children:
+                    next_level.append(child)
+            
+            levels.append(curr_level)
+            prev = next_level
+        
+        return levels
 
 """
 226. Invert Binary Tree
@@ -232,6 +350,54 @@ class Solution:
         new_node.right = self.helper(arr, mid+1, hi)
         
         return new_node
+
+"""
+235. Lowest Common Ancestor of a Binary Search Tree
+
+Given a binary search tree (BST), find the lowest common ancestor (LCA) of two given nodes in the BST.
+
+According to the definition of LCA on Wikipedia: “The lowest common ancestor is defined between two nodes p
+and q as the lowest node in T that has both p and q as descendants (where we allow a node to be a descendant
+of itself).”
+
+Given binary search tree:  root = [6,2,8,0,4,7,9,null,null,3,5]
+
+https://leetcode.com/problems/lowest-common-ancestor-of-a-binary-search-tree/
+
+Example 1:
+Input: root = [6,2,8,0,4,7,9,null,null,3,5], p = 2, q = 8
+Output: 6
+Explanation: The LCA of nodes 2 and 8 is 6.
+
+Example 2:
+Input: root = [6,2,8,0,4,7,9,null,null,3,5], p = 2, q = 4
+Output: 2
+Explanation: The LCA of nodes 2 and 4 is 2, since a node can be a descendant of itself according to the LCA definition.
+ 
+Note:
+All of the nodes' values will be unique.
+p and q are different and both values will exist in the BST.
+"""
+# Definition for a binary tree node.
+# class TreeNode(object):
+#     def __init__(self, x):
+#         self.val = x
+#         self.left = None
+#         self.right = None
+class Solution(object):
+    def lowestCommonAncestor(self, root, p, q):
+        """
+        :type root: TreeNode
+        :type p: TreeNode
+        :type q: TreeNode
+        :rtype: TreeNode
+        """
+        if p.val < root.val and q.val < root.val:
+            return self.lowestCommonAncestor(root.left, p, q)
+        elif p.val > root.val and q.val > root.val:
+            return self.lowestCommonAncestor(root.right, p ,q)
+        
+        return root
 
 """
 671. Second Minimum Node In a Binary Tree

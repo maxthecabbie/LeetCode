@@ -1,4 +1,54 @@
 """
+931. Minimum Falling Path Sum
+
+Given a square array of integers A, we want the minimum sum of a falling path through A.
+
+A falling path starts at any element in the first row, and chooses one element from each row. The next row's
+choice must be in a column that is different from the previous row's column by at most one.
+
+Example 1:
+Input: [[1,2,3],[4,5,6],[7,8,9]]
+Output: 12
+
+Explanation: 
+The possible falling paths are:
+[1,4,7], [1,4,8], [1,5,7], [1,5,8], [1,5,9]
+[2,4,7], [2,4,8], [2,5,7], [2,5,8], [2,5,9], [2,6,8], [2,6,9]
+[3,5,7], [3,5,8], [3,5,9], [3,6,8], [3,6,9]
+The falling path with the smallest sum is [1,4,7], so the answer is 12.
+
+Note:
+1 <= A.length == A[0].length <= 100
+-100 <= A[i][j] <= 100
+"""
+
+class Solution(object):
+    def minFallingPathSum(self, A):
+        """
+        :type A: List[List[int]]
+        :rtype: int
+        """
+        min_falling_path = sys.maxsize
+        
+        cache = [row[:] for row in A]
+        
+        for i in range(1, len(cache)):
+            for j in range(len(cache[0])):
+                
+                min_path = sys.maxsize
+                
+                for r, c in ((i-1, j-1), (i-1, j), (i-1, j+1)):                 
+                    if 0 <= c < len(cache[0]):
+                        min_path = min(min_path, cache[r][c])
+             
+                cache[i][j] += min_path
+        
+        for n in cache[-1]:
+            min_falling_path = min(min_falling_path, n)
+        
+        return min_falling_path
+
+"""
 22. Generate Parentheses
 
 Given n pairs of parentheses, write a function to generate all combinations of well-formed parentheses.
@@ -341,25 +391,117 @@ class Solution(object):
         :type n: int
         :rtype: int
         """
-        squares = self.get_squares(n)
-        cache = [sys.maxsize for _ in range(n + 1)]
+        cache = [sys.maxsize for _ in range(n+1)]
         cache[0] = 0
         
-        for i in range(1, n+1):
-            for sq in squares:
-                if sq <= i:
-                    cache[i] = min(cache[i], 1 + cache[i-sq])
-        return cache[n]
+        for i in range(len(cache)):
+            j = 1
+            while j*j <= i:
+                cache[i] = min(cache[i], 1 + cache[i - j*j])
+                j += 1
+        
+        return cache[-1]
+
+"""
+935. Knight Dialer
+
+A chess knight can move as indicated in the chess diagram below:
+https://leetcode.com/problems/knight-dialer/
+
+This time, we place our chess knight on any numbered key of a phone pad (indicated above), and the knight
+makes N-1 hops.  Each hop must be from one key to another numbered key.
+
+Each time it lands on a key (including the initial placement of the knight), it presses the number of that
+key, pressing N digits total.
+
+How many distinct numbers can you dial in this manner?
+
+Since the answer may be large, output the answer modulo 10^9 + 7.
+
+Example 1:
+Input: 1
+Output: 10
+
+Example 2:
+Input: 2
+Output: 20
+
+Example 3:
+Input: 3
+Output: 46
+"""
+
+class Solution(object):
+    def knightDialer(self, N):
+        """
+        :type N: int
+        :rtype: int
+        """
+        num_mapping = {
+            0: [4, 6], 1: [8, 6], 2: [7, 9],
+            3: [4, 8], 4: [3, 9, 0], 5: [],
+            6: [1, 7, 0], 7: [2, 6], 8: [1, 3],
+            9: [2, 4]
+        }
+        
+        counts = {n:1 for n in range(0, 10)}
+        
+        for _ in range(N-1):
+            new_count = {n:0 for n in range(0, 10)}
+            
+            for n in counts:
+                for next_num in num_mapping[n]:
+                    new_count[next_num] += counts[n]
+            
+            counts = new_count
+        
+        return sum([counts[key] for key in counts]) % (10**9 + 7)
+        
+
+"""
+213. House Robber II
+
+You are a professional robber planning to rob houses along a street. Each house has a certain amount of money
+stashed. All houses at this place are arranged in a circle. That means the first house is the neighbor of the
+last one. Meanwhile, adjacent houses have security system connected and it will automatically contact the 
+police if two adjacent houses were broken into on the same night.
+
+Given a list of non-negative integers representing the amount of money of each house, determine the maximum
+amount of money you can rob tonight without alerting the police.
+
+Example 1:
+Input: [2,3,2]
+Output: 3
+
+Explanation: You cannot rob house 1 (money = 2) and then rob house 3 (money = 2), because they are adjacent
+houses.
+             
+Example 2:
+Input: [1,2,3,1]
+Output: 4
+
+Explanation: Rob house 1 (money = 1) and then rob house 3 (money = 3). Total amount you can rob = 1 + 3 = 4.
+"""
+class Solution(object):
+    def rob(self, nums):
+        """
+        :type nums: List[int]
+        :rtype: int
+        """
+        if len(nums) == 1:
+            return nums[0]
+        return max(self.rob_impl(nums[1:]), self.rob_impl(nums[:-1]))
     
-    def get_squares(self, n):
-        i = 1
-        result = []
+    def rob_impl(self, nums):
+        max_money = 0
+        prev = two_away = 0
         
-        while i*i <= n:
-            result.append(i*i)
-            i += 1
+        for i in range(len(nums)):
+            max_money = max(prev, two_away + nums[i])
+            two_away = prev
+            prev = max_money
         
-        return result
+        return max_money
 
 """
 139. Word Break
@@ -412,6 +554,51 @@ class Solution:
                     return True
      
         cache[start] = False
+        return False
+
+"""
+55. Jump Game
+
+Given an array of non-negative integers, you are initially positioned at the first index of the array.
+
+Each element in the array represents your maximum jump length at that position.
+
+Determine if you are able to reach the last index.
+
+Example 1:
+Input: [2,3,1,1,4]
+Output: true
+Explanation: Jump 1 step from index 0 to 1, then 3 steps to the last index.
+
+Example 2:
+Input: [3,2,1,0,4]
+Output: false
+Explanation: You will always arrive at index 3 no matter what. Its maximum
+jump length is 0, which makes it impossible to reach the last index.
+"""
+
+class Solution(object):
+    def canJump(self, nums):
+        """
+        :type nums: List[int]
+        :rtype: bool
+        """
+        cache = [None for _ in range(len(nums))]
+        return self.can_jump_impl(0, nums, cache)
+    
+    def can_jump_impl(self, i, nums, cache):
+        if i == len(nums) - 1:
+            return True
+        
+        if cache[i] is not None:
+            return False
+        
+        for j in range(1, nums[i] + 1):
+            if i + j <= len(nums) - 1:
+                if self.can_jump_impl(i+j, nums, cache):
+                    return True
+        
+        cache[i] = False
         return False
 
 """
@@ -497,3 +684,51 @@ class Solution:
             return half * half
         else:
             return x * half * half
+
+"""
+91. Decode Ways
+
+A message containing letters from A-Z is being encoded to numbers using the following mapping:
+
+'A' -> 1
+'B' -> 2
+...
+'Z' -> 26
+
+Given a non-empty string containing only digits, determine the total number of ways to decode it.
+
+Example 1:
+Input: "12"
+Output: 2
+Explanation: It could be decoded as "AB" (1 2) or "L" (12).
+
+Example 2:
+Input: "226"
+Output: 3
+Explanation: It could be decoded as "BZ" (2 26), "VF" (22 6), or "BBF" (2 2 6).
+"""
+
+class Solution(object):
+    def numDecodings(self, s):
+        """
+        :type s: str
+        :rtype: int
+        """
+        cache = {}
+        return self.num_decodings_impl(0, s, cache)
+
+    def num_decodings_impl(self, i, s, cache):
+        if i == len(s):
+            return 1
+        elif s[i] == "0":
+            return 0
+        elif s[i:] in cache:
+            return cache[s[i:]]
+
+        ways = self.num_decodings_impl(i+1, s, cache)
+
+        if i+1 < len(s) and s[i : i+2] <= "26":
+            ways += self.num_decodings_impl(i+2, s, cache)
+        
+        cache[s[i:]] = ways
+        return ways

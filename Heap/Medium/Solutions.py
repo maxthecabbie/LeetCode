@@ -1,7 +1,57 @@
 """
+973. K Closest Points to Origin
+
+We have a list of points on the plane.  Find the K closest points to the origin (0, 0).
+
+(Here, the distance between two points on a plane is the Euclidean distance.)
+
+You may return the answer in any order.  The answer is guaranteed to be unique (except for the order that it
+is in.)
+
+Example 1:
+Input: points = [[1,3],[-2,2]], K = 1
+Output: [[-2,2]]
+
+Explanation: 
+The distance between (1, 3) and the origin is sqrt(10).
+The distance between (-2, 2) and the origin is sqrt(8).
+Since sqrt(8) < sqrt(10), (-2, 2) is closer to the origin.
+We only want the closest K = 1 points from the origin, so the answer is just [[-2,2]].
+
+Example 2:
+Input: points = [[3,3],[5,-1],[-2,4]], K = 2
+Output: [[3,3],[-2,4]]
+(The answer [[-2,4],[3,3]] would also be accepted.)
+ 
+Note:
+1 <= K <= points.length <= 10000
+-10000 < points[i][0] < 10000
+-10000 < points[i][1] < 10000
+"""
+
+class Solution(object):
+    def kClosest(self, points, K):
+        """
+        :type points: List[List[int]]
+        :type K: int
+        :rtype: List[List[int]]
+        """
+        heap = []
+        
+        for p in points:
+            d = (p[0] ** 2 + p[1] ** 2) ** 0.5
+            heapq.heappush(heap, (-d, p))
+            
+            if len(heap) > K:
+                heapq.heappop(heap)
+        
+        return [entry[1] for entry in heap]
+
+"""
 378. Kth Smallest Element in a Sorted Matrix
 
-Given a n x n matrix where each of the rows and columns are sorted in ascending order, find the kth smallest element in the matrix.
+Given a n x n matrix where each of the rows and columns are sorted in ascending order, find the kth smallest
+element in the matrix.
 
 Note that it is the kth smallest element in the sorted order, not the kth distinct element.
 
@@ -76,31 +126,84 @@ class Solution:
         return heapq.heappop(heap)
 
 # Alternative solution in O(n) average time using quickselect
-class Solution:
+class Solution(object):
     def findKthLargest(self, nums, k):
-        return self.findKthSmallest(nums, len(nums) + 1 - k)
-
-    def findKthSmallest(self, nums, k):
-        if nums:
-            pos = self.partition(nums, 0, len(nums) - 1)
-            if k > pos + 1:
-                return self.findKthSmallest(nums[pos + 1:], k - pos - 1)
-            elif k < pos + 1:
-                return self.findKthSmallest(nums[:pos], k)
-            else:
-                return nums[pos]
-
-    def partition(self, nums, l, r):
-        lo = l
-        
-        while l < r:
-            if nums[l] < nums[r]:
-                nums[l], nums[lo] = nums[lo], nums[l]
-                lo += 1
-            l += 1
+        """
+        :type nums: List[int]
+        :type k: int
+        :rtype: int
+        """
+        return self.quick_select(nums, 0, len(nums) - 1, k)
+    
+    def quick_select(self, nums, lo, hi, k):
+        if lo <= hi:
+            p = self.partition(nums, lo, hi)
             
-        nums[lo], nums[r] = nums[r], nums[lo]
-        return low
+            if k-1 == p:
+                return nums[p]
+            elif k-1 < p:
+                return self.quick_select(nums, lo, p-1, k)
+            else:
+                return self.quick_select(nums, p+1, hi, k)
+
+    def partition(self, nums, lo, hi):
+        swap = lo
+        
+        for i in range(lo, hi):
+            if nums[i] > nums[hi]:
+                nums[i], nums[swap] = nums[swap], nums[i]
+                swap += 1
+        
+        nums[swap], nums[hi] = nums[hi], nums[swap]
+        return swap
+
+"""
+692. Top K Frequent Words
+
+Given a non-empty list of words, return the k most frequent elements.
+
+Your answer should be sorted by frequency from highest to lowest. If two words have the same frequency, then
+the word with the lower alphabetical order comes first.
+
+Example 1:
+Input: ["i", "love", "leetcode", "i", "love", "coding"], k = 2
+Output: ["i", "love"]
+
+Explanation: "i" and "love" are the two most frequent words.
+Note that "i" comes before "love" due to a lower alphabetical order.
+
+Example 2:
+Input: ["the", "day", "is", "sunny", "the", "the", "the", "sunny", "is", "is"], k = 4
+Output: ["the", "is", "sunny", "day"]
+
+Explanation: "the", "is", "sunny" and "day" are the four most frequent words,
+with the number of occurrence being 4, 3, 2 and 1 respectively.
+
+Note:
+You may assume k is always valid, 1 ≤ k ≤ number of unique elements.
+Input words contain only lowercase letters.
+
+Follow up:
+Try to solve it in O(n log k) time and O(n) extra space.
+"""
+
+class Solution(object):
+    def topKFrequent(self, words, k):
+        """
+        :type words: List[str]
+        :type k: int
+        :rtype: List[str]
+        """
+        res = []
+        
+        counts = collections.Counter(words)
+        heap = [(-counts[word], word) for word in counts]
+        heapq.heapify(heap)
+        
+        for _ in range(k):
+            res.append(heapq.heappop(heap)[1])
+        
+        return res
 
 """
 253. Meeting Rooms II

@@ -41,6 +41,87 @@ class Solution:
         return True
 
 """
+202. Happy Number
+
+Write an algorithm to determine if a number is "happy".
+
+A happy number is a number defined by the following process: Starting with any positive integer, replace the
+number by the sum of the squares of its digits, and repeat the process until the number equals 1 (where it
+will stay), or it loops endlessly in a cycle which does not include 1. Those numbers for which this process
+ends in 1 are happy numbers.
+
+Example: 
+Input: 19
+Output: true
+Explanation: 
+12 + 92 = 82
+82 + 22 = 68
+62 + 82 = 100
+12 + 02 + 02 = 1
+"""
+class Solution(object):
+    def isHappy(self, n):
+        """
+        :type n: int
+        :rtype: bool
+        """
+        cache = set()
+        
+        while n != 1:
+            if n in cache:
+                return False
+            cache.add(n)
+            
+            digits = []
+            pos = 1
+            
+            while n // pos > 0:
+                digits.append((n // pos) % 10)
+                pos *= 10
+            
+            n = sum([digit*digit for digit in digits])
+            
+        return True
+
+"""
+204. Count Primes
+
+Count the number of prime numbers less than a non-negative number, n.
+
+Example:
+Input: 10
+Output: 4
+Explanation: There are 4 prime numbers less than 10, they are 2, 3, 5, 7.
+"""
+class Solution(object):
+    def countPrimes(self, n):
+        """
+        :type n: int
+        :rtype: int
+        """
+        if n <= 1:
+            return 0
+        
+        primes = [True for _ in range(n)]
+        primes[0], primes[1] = False, False
+        
+        i = 2
+        while i*i <= n:
+            if primes[i]:
+                j = i*i
+                while j < n:
+                    primes[j] = False
+                    j += i
+            i += 1
+    
+        count = 0
+        for n in primes:
+            if n:
+                count += 1
+        
+        return count
+
+"""
 7. Reverse Integer
 
 Given a 32-bit signed integer, reverse digits of an integer.
@@ -62,7 +143,6 @@ Assume we are dealing with an environment which could only store integers within
 range: [−231,  231 − 1]. For the purpose of this problem, assume that your function returns 0 when the 
 reversed integer overflows.
 """
-
 class Solution:
     def reverse(self, x):
         """
