@@ -243,6 +243,56 @@ class Solution:
         return len(heap)            
 
 """
+767. Reorganize String
+
+Given a string S, check if the letters can be rearranged so that two characters that are adjacent to each
+other are not the same.
+
+If possible, output any possible result.  If not possible, return the empty string.
+
+Example 1:
+
+Input: S = "aab"
+Output: "aba"
+Example 2:
+
+Input: S = "aaab"
+Output: ""
+
+Note:
+1. S will consist of lowercase letters and have length in range [1, 500].
+"""
+
+class Solution(object):
+    def reorganizeString(self, S):
+        """
+        :type S: str
+        :rtype: str
+        """
+        res = []
+        heap = [(-S.count(c), c) for c in set(S)]
+        heapq.heapify(heap)
+        
+        while len(heap) > 1:
+            count1, char1 = heapq.heappop(heap)
+            count2, char2 = heapq.heappop(heap)
+            
+            res.append(char1 + char2)
+
+            if abs(count1) > 1:
+                heapq.heappush(heap, (count1 + 1, char1))
+            if abs(count2) > 1:
+                heapq.heappush(heap, (count2 + 1, char2))
+
+        if heap:
+            count, char = heapq.heappop(heap)
+            if abs(count) > 1:
+                return ""
+            res.append(char)
+            
+        return "".join(res)
+
+"""
 373. Find K Pairs with Smallest Sums
 
 You are given two integer arrays nums1 and nums2 sorted in ascending order and an integer k.

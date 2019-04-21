@@ -474,6 +474,124 @@ class Solution:
         return -1.0
 
 """
+785. Is Graph Bipartite?
+
+Given an undirected graph, return true if and only if it is bipartite.
+
+Recall that a graph is bipartite if we can split it's set of nodes into two independent subsets A and B such
+that every edge in the graph has one node in A and another node in B.
+
+The graph is given in the following form: graph[i] is a list of indexes j for which the edge between nodes i
+and j exists.  Each node is an integer between 0 and graph.length - 1.  There are no self edges or parallel
+edges: graph[i] does not contain i, and it doesn't contain any element twice.
+
+Example 1:
+Input: [[1,3], [0,2], [1,3], [0,2]]
+Output: true
+
+Explanation: 
+The graph looks like this:
+0----1
+|    |
+|    |
+3----2
+We can divide the vertices into two groups: {0, 2} and {1, 3}.
+
+Example 2:
+Input: [[1,2,3], [0,2], [0,1,3], [0,2]]
+Output: false
+
+Explanation: 
+The graph looks like this:
+0----1
+| \  |
+|  \ |
+3----2
+We cannot find a way to divide the set of nodes into two independent subsets.
+
+Note:
+1. graph will have length in range [1, 100].
+2. graph[i] will contain integers in range [0, graph.length - 1].
+3. graph[i] will not contain i or duplicate values.
+4. The graph is undirected: if any element j is in graph[i], then i will be in graph[j].
+"""
+
+class Solution(object):
+    def isBipartite(self, graph):
+        """
+        :type graph: List[List[int]]
+        :rtype: bool
+        """
+        color = {}
+        
+        for node in range(len(graph)):
+            if node not in color:
+                color[node] = 1
+                if not self.dfs(node, graph, color):
+                    return False
+        
+        return True
+    
+    def dfs(self, root, graph, color):
+        for node in graph[root]:
+            if node in color:
+                if color[node] == color[root]:
+                    return False
+            else:
+                color[node] = 2 if color[root] == 1 else 1
+                if not self.dfs(node, graph, color):
+                    return False
+        
+        return True
+
+"""
+743. Network Delay Time
+
+There are N network nodes, labelled 1 to N.
+
+Given times, a list of travel times as directed edges times[i] = (u, v, w), where u is the source node, v is
+the target node, and w is the time it takes for a signal to travel from source to target.
+
+Now, we send a signal from a certain node K. How long will it take for all nodes to receive the signal? If it
+is impossible, return -1.
+
+Note:
+1. N will be in the range [1, 100].
+2. K will be in the range [1, N].
+3. The length of times will be in the range [1, 6000].
+4. All edges times[i] = (u, v, w) will have 1 <= u, v <= N and 0 <= w <= 100.
+"""
+
+class Solution(object):
+    def networkDelayTime(self, times, N, K):
+        """
+        :type times: List[List[int]]
+        :type N: int
+        :type K: int
+        :rtype: int
+        """
+        graph = collections.defaultdict(list)
+        for u, v, t in times:
+            graph[u].append((v, t))
+        
+        heap = [(0, K)]
+        vis = set()
+        
+        while heap:
+            curr_time, u = heapq.heappop(heap)
+            
+            vis.add(u)
+            if len(vis) == N:
+                return curr_time
+            
+            for v, time in graph[u]:
+                if v not in vis:
+                    heapq.heappush(heap, (curr_time + time, v))
+        
+        return -1
+        
+
+"""
 200. Number of Islands
 
 Given a 2d grid map of '1's (land) and '0's (water), count the number of islands. An island is surrounded by 
@@ -793,6 +911,99 @@ class Solution:
                     q.put((r, c))
         
         return matrix
+
+"""
+909. Snakes and Ladders
+
+On an N x N board, the numbers from 1 to N*N are written boustrophedonically starting from the bottom left of
+the board, and alternating direction each row.  For example, for a 6 x 6 board, the numbers are written as
+follows:
+
+https://leetcode.com/problems/snakes-and-ladders/
+
+You start on square 1 of the board (which is always in the last row and first column).  Each move, starting
+from square x, consists of the following:
+
+You choose a destination square S with number x+1, x+2, x+3, x+4, x+5, or x+6, provided this number is <=
+N*N.
+(This choice simulates the result of a standard 6-sided die roll: ie., there are always at most 6
+destinations, regardless of the size of the board.)
+If S has a snake or ladder, you move to the destination of that snake or ladder.  Otherwise, you move to S.
+A board square on row r and column c has a "snake or ladder" if board[r][c] != -1.  The destination of that
+snake or ladder is board[r][c].
+
+Note that you only take a snake or ladder at most once per move: if the destination to a snake or ladder is
+the start of another snake or ladder, you do not continue moving.  (For example, if the board is `[[4,-1],
+[-1,3]]`, and on the first move your destination square is `2`, then you finish your first move at `3`,
+because you do not continue moving to `4`.)
+
+Return the least number of moves required to reach square N*N.  If it is not possible, return -1.
+
+Example 1:
+Input: [
+[-1,-1,-1,-1,-1,-1],
+[-1,-1,-1,-1,-1,-1],
+[-1,-1,-1,-1,-1,-1],
+[-1,35,-1,-1,13,-1],
+[-1,-1,-1,-1,-1,-1],
+[-1,15,-1,-1,-1,-1]]
+Output: 4
+
+Explanation: 
+At the beginning, you start at square 1 [at row 5, column 0].
+You decide to move to square 2, and must take the ladder to square 15.
+You then decide to move to square 17 (row 3, column 5), and must take the snake to square 13.
+You then decide to move to square 14, and must take the ladder to square 35.
+You then decide to move to square 36, ending the game.
+It can be shown that you need at least 4 moves to reach the N*N-th square, so the answer is 4.
+
+Note:
+1. 2 <= board.length = board[0].length <= 20
+2. board[i][j] is between 1 and N*N or is equal to -1.
+3. The board square with number 1 has no snake or ladder.
+4. The board square with number N*N has no snake or ladder.
+"""
+
+class Solution(object):
+    def snakesAndLadders(self, board):
+        """
+        :type board: List[List[int]]
+        :rtype: int
+        """
+        queue = collections.deque([(1, 0)])
+        vis = set([1])
+        n = len(board)
+        
+        while queue:
+            cell, moves = queue.popleft()
+            
+            if cell == n*n:
+                return moves
+            
+            for d in range(1, 7):
+                next_cell = cell + d
+                
+                if next_cell <= n*n:
+                    i, j = self.get_coord(next_cell, board)
+                    if board[i][j] != -1:
+                        next_cell = board[i][j]
+                    if next_cell not in vis:
+                        vis.add(next_cell)
+                        queue.append((next_cell, moves + 1))
+        
+        return -1
+    
+    def get_coord(self, cell, board):
+        n = len(board)
+        idx = cell - 1
+        last = n-1
+        
+        i = last - (idx // n)
+        go_right = (last - i) % 2 == 0
+        j = idx % n if go_right else last - (idx % n)
+        
+        return i, j
+
 
 """
 332. Reconstruct Itinerary

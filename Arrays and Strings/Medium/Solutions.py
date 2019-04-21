@@ -4175,3 +4175,40 @@ class Solution:
             i += 1
 
         return min(2**31 - 1, max(-2**31, sign * n))
+
+"""
+151. Reverse Words in a String
+
+Given an input string, reverse the string word by word.
+
+Example 1:
+Input: "the sky is blue"
+Output: "blue is sky the"
+
+Example 2:
+Input: "  hello world!  "
+Output: "world! hello"
+
+Explanation: Your reversed string should not contain leading or trailing spaces.
+
+Example 3:
+Input: "a good   example"
+Output: "example good a"
+
+Explanation: You need to reduce multiple spaces between two words to a single space in the reversed string.
+"""
+
+class Solution(object):
+    def reverseWords(self, s):
+        """
+        :type s: str
+        :rtype: str
+        """
+        res = []
+        s = s.split()
+        
+        for i in range(len(s) - 1, -1, -1):
+            res.append(s[i])
+        
+        return " ".join(res)
+        
