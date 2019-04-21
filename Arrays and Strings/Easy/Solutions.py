@@ -34,6 +34,37 @@ class Solution:
         return n
 
 """
+905. Sort Array By Parity
+
+Given an array A of non-negative integers, return an array consisting of all the even elements of A, 
+followed by all the odd elements of A.
+
+You may return any answer array that satisfies this condition.
+
+Example 1:
+Input: [3,1,2,4]
+Output: [2,4,3,1]
+The outputs [4,2,3,1], [2,4,1,3], and [4,2,1,3] would also be accepted.
+ 
+Note:
+1 <= A.length <= 5000
+0 <= A[i] <= 5000
+"""
+
+class Solution:
+    def sortArrayByParity(self, A):
+        """
+        :type A: List[int]
+        :rtype: List[int]
+        """
+        last = 0
+        for i in range(len(A)):
+            if A[i] % 2 == 0:
+                A[i], A[last] = A[last], A[i]
+                last += 1
+        return A
+
+"""
 760. Find Anagram Mappings
 
 Given two lists Aand B, and B is an anagram of A. B is an anagram of A means B is made by randomizing the 
@@ -312,6 +343,73 @@ class Solution:
                 freq[ind] -= 1
                 
         return result
+
+"""
+867. Transpose Matrix
+
+Given a matrix A, return the transpose of A.
+
+The transpose of a matrix is the matrix flipped over it's main diagonal, switching the row and column 
+indices of the matrix.
+
+Example 1:
+Input: [[1,2,3],[4,5,6],[7,8,9]]
+Output: [[1,4,7],[2,5,8],[3,6,9]]
+
+Example 2:
+Input: [[1,2,3],[4,5,6]]
+Output: [[1,4],[2,5],[3,6]]
+
+Note:
+1 <= A.length <= 1000
+1 <= A[0].length <= 1000
+"""
+
+class Solution:
+    def transpose(self, A):
+        """
+        :type A: List[List[int]]
+        :rtype: List[List[int]]
+        """
+        res = []
+        for i in range(len(A[0])):
+            res.append([A[j][i] for j in range(len(A))])
+        return res
+
+"""
+557. Reverse Words in a String III
+
+Given a string, you need to reverse the order of characters in each word within a sentence while still 
+preserving whitespace and initial word order.
+
+Example 1:
+Input: "Let's take LeetCode contest"
+Output: "s'teL ekat edoCteeL tsetnoc"
+
+Note: In the string, each word is separated by single space and there will not be any extra space in the 
+string.
+"""
+
+class Solution:
+    def reverseWords(self, s):
+        """
+        :type s: str
+        :rtype: str
+        """
+        s = [c for c in s]
+        i = 0
+        for j in range(len(s)):
+            if s[j] == " " or j == len(s) - 1:
+                end = j if j == len(s) - 1 else j-1
+                self.reverse(s, i, end)
+                i = j+1
+        return "".join(s)
+    
+    def reverse(self, s, i, j):
+        while i < j:
+            s[i], s[j] = s[j], s[i]
+            i += 1
+            j -= 1
 
 """
 344. Reverse String
@@ -908,6 +1006,96 @@ class Solution:
         return -1
 
 """
+167. Two Sum II - Input array is sorted
+
+Given an array of integers that is already sorted in ascending order, find two numbers such that they add up 
+to a specific target number.
+
+The function twoSum should return indices of the two numbers such that they add up to the target, where 
+index1 must be less than index2.
+
+Note: 
+Your returned answers (both index1 and index2) are not zero-based.
+You may assume that each input would have exactly one solution and you may not use the same element twice.
+
+Example:
+Input: numbers = [2,7,11,15], target = 9
+Output: [1,2]
+Explanation: The sum of 2 and 7 is 9. Therefore index1 = 1, index2 = 2.
+"""
+
+class Solution:
+    def twoSum(self, numbers, target):
+        """
+        :type numbers: List[int]
+        :type target: int
+        :rtype: List[int]
+        """
+        i, j = 0, len(numbers) - 1
+        
+        while i < j:
+            tot = numbers[i] + numbers[j]
+            if tot == target:
+                return [i+1, j+1]
+            elif tot > target:
+                j -= 1
+            else:
+                i += 1
+        
+        return [-1, -1]
+
+"""
+830. Positions of Large Groups
+
+In a string S of lowercase letters, these letters form consecutive groups of the same character.
+
+For example, a string like S = "abbxxxxzyy" has the groups "a", "bb", "xxxx", "z" and "yy".
+
+Call a group large if it has 3 or more characters.  We would like the starting and ending positions of every 
+large group.
+
+The final answer should be in lexicographic order.
+
+Example 1:
+
+Input: "abbxxxxzzy"
+Output: [[3,6]]
+Explanation: "xxxx" is the single large group with starting  3 and ending positions 6.
+
+Example 2:
+Input: "abc"
+Output: []
+Explanation: We have "a","b" and "c" but no large group.
+
+Example 3:
+Input: "abcdddeeeeaabbbcd"
+Output: [[3,5],[6,9],[12,14]]
+ 
+Note:  1 <= S.length <= 1000
+"""
+
+class Solution:
+    def largeGroupPositions(self, S):
+        """
+        :type S: str
+        :rtype: List[List[int]]
+        """
+        res = []
+        last = 0
+        count = 1
+        
+        for i in range(1, len(S)):
+            if S[i-1] == S[i]:
+                count += 1
+            if S[i-1] != S[i] or i == len(S) - 1:
+                if count >= 3:
+                    res.append([last, last + count - 1])
+                count = 1
+                last = i
+        
+        return res
+
+"""
 268. Missing Number
 
 Given an array containing n distinct numbers taken from 0, 1, 2, ..., n, find the one that is missing from 
@@ -926,13 +1114,14 @@ Your algorithm should run in linear runtime complexity. Could you implement it u
 space complexity?
 """
 
-class Solution:
+class Solution(object):
     def missingNumber(self, nums):
         """
         :type nums: List[int]
         :rtype: int
         """
-        return sum(range(len(nums) + 1)) - sum(nums)
+        n = len(nums)
+        return (n*(n+1))//2 - sum(nums)
 
 """
 167. Two Sum II - Input array is sorted

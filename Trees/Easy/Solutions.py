@@ -116,6 +116,57 @@ class Solution(object):
         return 1 + max_child
 
 """
+700. Search in a Binary Search Tree
+
+Given the root node of a binary search tree (BST) and a value. You need to find the node in the BST that the 
+node's value equals the given value. Return the subtree rooted with that node. If such node doesn't exist, 
+you should return NULL.
+
+For example, 
+Given the tree:
+        4
+       / \
+      2   7
+     / \
+    1   3
+
+And the value to search: 2
+You should return this subtree:
+
+      2     
+     / \   
+    1   3
+In the example above, if we want to search the value 5, since there is no node with value 5, we should 
+return NULL.
+
+Note that an empty tree is represented by NULL, therefore you would see the expected output (serialized tree 
+format) as [], not null.
+"""
+# Definition for a binary tree node.
+# class TreeNode:
+#     def __init__(self, x):
+#         self.val = x
+#         self.left = None
+#         self.right = None
+
+class Solution:
+    def searchBST(self, root, val):
+        """
+        :type root: TreeNode
+        :type val: int
+        :rtype: TreeNode
+        """
+        while root:
+            if val == root.val:
+                return root
+            elif val > root.val:
+                root = root.right
+            else:
+                root = root.left
+        
+        return None
+
+"""
 104. Maximum Depth of Binary Tree
 
 Given a binary tree, find its maximum depth.
@@ -303,6 +354,63 @@ class Solution(object):
         left = self.helper(root.left, k, num_set)
         right = self.helper(root.right, k, num_set)
         return left or right
+
+"""
+100. Same Tree
+
+Given two binary trees, write a function to check if they are the same or not.
+
+Two binary trees are considered the same if they are structurally identical and the nodes have the same 
+value.
+
+Example 1:
+Input:     1         1
+          / \       / \
+         2   3     2   3
+
+        [1,2,3],   [1,2,3]
+
+Output: true
+
+Example 2:
+Input:     1         1
+          /           \
+         2             2
+
+        [1,2],     [1,null,2]
+
+Output: false
+
+Example 3:
+Input:     1         1
+          / \       / \
+         2   1     1   2
+
+        [1,2,1],   [1,1,2]
+
+Output: false
+"""
+
+# Definition for a binary tree node.
+# class TreeNode:
+#     def __init__(self, x):
+#         self.val = x
+#         self.left = None
+#         self.right = None
+class Solution:
+    def isSameTree(self, p, q):
+        """
+        :type p: TreeNode
+        :type q: TreeNode
+        :rtype: bool
+        """
+        if p is None and q is None:
+            return True
+        if p is None or q is None:
+            return False
+        
+        return p.val == q.val and self.isSameTree(p.left, q.left) \
+        and self.isSameTree(p.right, q.right)
 
 """
 108. Convert Sorted Array to Binary Search Tree
@@ -606,9 +714,8 @@ class Solution:
         if s is None: 
             return False
         
-        if s.val == t.val:
-            if self.is_equal(s, t): 
-                return True
+        if s.val == t.val and self.is_equal(s, t):
+            return True
 
         return self.isSubtree(s.left, t) or self.isSubtree(s.right, t)
     
