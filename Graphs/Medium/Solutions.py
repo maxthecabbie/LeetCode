@@ -474,6 +474,82 @@ class Solution:
         return -1.0
 
 """
+863. All Nodes Distance K in Binary Tree
+
+We are given a binary tree (with root node root), a target node, and an integer value K.
+
+Return a list of the values of all nodes that have a distance K from the target node.  The answer can be
+returned in any order.
+
+Example 1:
+Input: root = [3,5,1,6,2,0,8,null,null,7,4], target = 5, K = 2
+Output: [7,4,1]
+
+Explanation: 
+The nodes that are a distance 2 from the target node (with value 5)
+have values 7, 4, and 1.
+
+https://leetcode.com/problems/all-nodes-distance-k-in-binary-tree/
+
+Note that the inputs "root" and "target" are actually TreeNodes.
+The descriptions of the inputs above are just serializations of these objects.
+
+Note:
+1. The given tree is non-empty.
+2. Each node in the tree has unique values 0 <= node.val <= 500.
+3. The target node is a node in the tree.
+4. 0 <= K <= 1000.
+"""
+
+# Definition for a binary tree node.
+# class TreeNode(object):
+#     def __init__(self, x):
+#         self.val = x
+#         self.left = None
+#         self.right = None
+class Solution(object):
+    def distanceK(self, root, target, K):
+        """
+        :type root: TreeNode
+        :type target: TreeNode
+        :type K: int
+        :rtype: List[int]
+        """
+        res = []
+        
+        graph = collections.defaultdict(set)
+        self.build_graph(root, graph)
+        
+        queue = collections.deque([(target.val, 0)])
+        vis = set([target.val])
+        
+        while queue:
+            curr_node, moves = queue.popleft()
+            
+            if moves == K:
+                res.append(curr_node)
+            
+            for node in graph[curr_node]:
+                if node not in vis and moves < K:
+                    queue.append((node, moves + 1))
+                    vis.add(node)
+        
+        return res
+    
+    def build_graph(self, root, graph): 
+        left, right = root.left, root.right
+        
+        if left:
+            graph[root.val].add(left.val)
+            graph[left.val].add(root.val)
+            self.build_graph(left, graph)
+            
+        if right:
+            graph[root.val].add(right.val)
+            graph[right.val].add(root.val)
+            self.build_graph(right, graph)
+
+"""
 785. Is Graph Bipartite?
 
 Given an undirected graph, return true if and only if it is bipartite.
