@@ -117,7 +117,124 @@ class Solution(object):
             need = child_coins - (root.val - 1)
             moves += need
             return (need, moves)
+
+"""
+366. Find Leaves of Binary Tree
+
+Given a binary tree, collect a tree's nodes as if you were doing this: Collect and remove all leaves, repeat
+until the tree is empty.
+
+Example:
+Input: [1,2,3,4,5]
+  
+          1
+         / \
+        2   3
+       / \     
+      4   5    
+      
+Output: [[4,5,3],[2],[1]]
+ 
+Explanation:
+1. Removing the leaves [4,5,3] would result in this tree:
+
+          1
+         / 
+        2          
+ 
+2. Now removing the leaf [2] would result in this tree:
+
+          1          
+
+3. Now removing the leaf [1] would result in the empty tree:
+
+          []         
+"""
+
+# Definition for a binary tree node.
+# class TreeNode(object):
+#     def __init__(self, x):
+#         self.val = x
+#         self.left = None
+#         self.right = None
+class Solution(object):
+    def findLeaves(self, root):
+        """
+        :type root: TreeNode
+        :rtype: List[List[int]]
+        """
+        res = []
+        self.find_leaves_impl(root, res)
+        return res
         
+    def find_leaves_impl(self, root, res):
+        if root is None:
+            return 0
+        
+        left = self.find_leaves_impl(root.left, res)
+        right = self.find_leaves_impl(root.right, res)
+        idx = max(left, right)
+        
+        if idx + 1 > len(res):
+            res.append([])
+        
+        res[idx].append(root.val)
+        
+        return idx + 1
+
+"""
+250. Count Univalue Subtrees
+
+Given a binary tree, count the number of uni-value subtrees.
+
+A Uni-value subtree means all nodes of the subtree have the same value.
+
+Example :
+Input:  root = [5,1,5,5,5,null,5]
+
+              5
+             / \
+            1   5
+           / \   \
+          5   5   5
+
+Output: 4
+"""
+
+# Definition for a binary tree node.
+# class TreeNode(object):
+#     def __init__(self, x):
+#         self.val = x
+#         self.left = None
+#         self.right = None
+class Solution(object):
+    def countUnivalSubtrees(self, root):
+        """
+        :type root: TreeNode
+        :rtype: int
+        """
+        if root is None:
+            return 0
+        return self.count_unival_subtrees_impl(root)[1]
+    
+    def count_unival_subtrees_impl(self, root):
+        if root.left is None and root.right is None:
+            return [root.val, 1]
+        
+        left, right = [root.val, 0], [root.val, 0]
+        
+        if root.left:
+            left = self.count_unival_subtrees_impl(root.left)
+        if root.right:
+            right = self.count_unival_subtrees_impl(root.right)
+
+        if left[0] is None or right[0] is None:
+            return [None, left[1] + right[1]]
+        elif root.val == left[0] == right[0]:
+            return [root.val, 1 + left[1] + right[1]]
+        else:
+            return [None, left[1] + right[1]]
+          
 
 """
 729. My Calendar I
@@ -409,6 +526,60 @@ class Solution(object):
             
             return root
 
+"""
+109. Convert Sorted List to Binary Search Tree
+
+Given a singly linked list where elements are sorted in ascending order, convert it to a height balanced BST.
+
+For this problem, a height-balanced binary tree is defined as a binary tree in which the depth of the two
+subtrees of every node never differ by more than 1.
+
+Example:
+Given the sorted linked list: [-10,-3,0,5,9],
+
+One possible answer is: [0,-3,9,-10,null,5], which represents the following height balanced BST:
+      0
+     / \
+   -3   9
+   /   /
+ -10  5
+"""
+
+# Definition for singly-linked list.
+# class ListNode(object):
+#     def __init__(self, x):
+#         self.val = x
+#         self.next = None
+
+# Definition for a binary tree node.
+# class TreeNode(object):
+#     def __init__(self, x):
+#         self.val = x
+#         self.left = None
+#         self.right = None
+class Solution(object):
+    def sortedListToBST(self, head):
+        """
+        :type head: ListNode
+        :rtype: TreeNode
+        """
+        vals = []
+        while head:
+            vals.append(head.val)
+            head = head.next
+
+        return self.build_tree(vals)
+    
+    def build_tree(self, vals):
+        if not vals:
+            return None
+        
+        mid = (0 + len(vals) - 1) // 2
+        root = TreeNode(vals[mid])
+        root.left = self.build_tree(vals[:mid])
+        root.right = self.build_tree(vals[mid+1:])
+        
+        return root
 
 """
 450. Delete Node in a BST
@@ -947,6 +1118,199 @@ class Solution:
         left = self.find_longest(root.left, root.val, next_n)
         right = self.find_longest(root.right, root.val, next_n)
         return max(n, max(left, right))
+
+"""
+863. All Nodes Distance K in Binary Tree
+
+We are given a binary tree (with root node root), a target node, and an integer value K.
+
+Return a list of the values of all nodes that have a distance K from the target node.  The answer can be
+returned in any order.
+
+Example 1:
+Input: root = [3,5,1,6,2,0,8,null,null,7,4], target = 5, K = 2
+Output: [7,4,1]
+
+Explanation: 
+The nodes that are a distance 2 from the target node (with value 5)
+have values 7, 4, and 1.
+
+https://leetcode.com/problems/all-nodes-distance-k-in-binary-tree/
+
+Note that the inputs "root" and "target" are actually TreeNodes.
+The descriptions of the inputs above are just serializations of these objects.
+
+Note:
+1. The given tree is non-empty.
+2. Each node in the tree has unique values 0 <= node.val <= 500.
+3. The target node is a node in the tree.
+4. 0 <= K <= 1000.
+"""
+
+# Definition for a binary tree node.
+# class TreeNode(object):
+#     def __init__(self, x):
+#         self.val = x
+#         self.left = None
+#         self.right = None
+class Solution(object):
+    def distanceK(self, root, target, K):
+        """
+        :type root: TreeNode
+        :type target: TreeNode
+        :type K: int
+        :rtype: List[int]
+        """
+        res = []
+        
+        graph = collections.defaultdict(set)
+        self.build_graph(root, graph)
+        
+        queue = collections.deque([(target.val, 0)])
+        vis = set([target.val])
+        
+        while queue:
+            curr_node, moves = queue.popleft()
+            
+            if moves == K:
+                res.append(curr_node)
+            
+            for node in graph[curr_node]:
+                if node not in vis and moves < K:
+                    queue.append((node, moves + 1))
+                    vis.add(node)
+        
+        return res
+    
+    def build_graph(self, root, graph): 
+        left, right = root.left, root.right
+        
+        if left:
+            graph[root.val].add(left.val)
+            graph[left.val].add(root.val)
+            self.build_graph(left, graph)
+            
+        if right:
+            graph[root.val].add(right.val)
+            graph[right.val].add(root.val)
+            self.build_graph(right, graph)
+        
+
+"""
+449. Serialize and Deserialize BST
+
+Serialization is the process of converting a data structure or object into a sequence of bits so that it can
+be stored in a file or memory buffer, or transmitted across a network connection link to be reconstructed
+later in the same or another computer environment.
+
+Design an algorithm to serialize and deserialize a binary search tree. There is no restriction on how your
+serialization/deserialization algorithm should work. You just need to ensure that a binary search tree can
+be serialized to a string and this string can be deserialized to the original tree structure.
+
+The encoded string should be as compact as possible.
+
+Note: Do not use class member/global/static variables to store states. Your serialize and deserialize
+algorithms should be stateless.
+"""
+
+# Definition for a binary tree node.
+# class TreeNode(object):
+#     def __init__(self, x):
+#         self.val = x
+#         self.left = None
+#         self.right = None
+class Codec:
+
+    def serialize(self, root):
+        """Encodes a tree to a single string.
+        
+        :type root: TreeNode
+        :rtype: str
+        """
+        res = []
+        self.preorder(root, res)
+        return ":".join(res)
+    
+    def preorder(self, root, res):
+        if root is None:
+            return
+        
+        res.append(str(root.val))
+        self.preorder(root.left, res)
+        self.preorder(root.right, res)
+        
+
+    def deserialize(self, data):
+        """Decodes your encoded data to tree.
+        
+        :type data: str
+        :rtype: TreeNode
+        """
+        if not data:
+            return None
+        
+        queue = collections.deque([int(val) for val in data.split(":")])
+        return self.build_bst(queue, -sys.maxsize, sys.maxsize)
+    
+    def build_bst(self, queue, min_val, max_val):
+        if queue and min_val < queue[0] < max_val:
+            node = TreeNode(queue.popleft())
+            
+            node.left = self.build_bst(queue, min_val, node.val)
+            node.right = self.build_bst(queue, node.val, max_val)
+            return node
+
+# Your Codec object will be instantiated and called as such:
+# codec = Codec()
+# codec.deserialize(codec.serialize(root))
+
+"""
+199. Binary Tree Right Side View
+
+Given a binary tree, imagine yourself standing on the right side of it, return the values of the nodes you
+can see ordered from top to bottom.
+
+Example:
+Input: [1,2,3,null,5,null,4]
+Output: [1, 3, 4]
+
+Explanation:
+
+   1            <---
+ /   \
+2     3         <---
+ \     \
+  5     4       <---
+"""
+
+# Definition for a binary tree node.
+# class TreeNode(object):
+#     def __init__(self, x):
+#         self.val = x
+#         self.left = None
+#         self.right = None
+class Solution(object):
+    def rightSideView(self, root):
+        """
+        :type root: TreeNode
+        :rtype: List[int]
+        """
+        res = []
+        prev = [root] if root else []
+        
+        while prev:
+            curr = []
+            
+            for node in prev:
+                if node.left:
+                    curr.append(node.left)
+                if node.right:
+                    curr.append(node.right)
+            
+            res.append(prev[-1].val)
+            prev = curr
+        
+        return res
 
 """
 129. Sum Root to Leaf Numbers

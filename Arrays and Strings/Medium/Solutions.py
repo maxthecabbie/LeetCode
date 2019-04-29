@@ -705,6 +705,80 @@ class Solution(object):
 # param_2 = obj.shuffle()
 
 """
+12. Integer to Roman
+
+Roman numerals are represented by seven different symbols: I, V, X, L, C, D and M.
+
+Symbol       Value
+I             1
+V             5
+X             10
+L             50
+C             100
+D             500
+M             1000
+
+For example, two is written as II in Roman numeral, just two one's added together. Twelve is written as, XII,
+which is simply X + II. The number twenty seven is written as XXVII, which is XX + V + II.
+
+Roman numerals are usually written largest to smallest from left to right. However, the numeral for four is
+not IIII. Instead, the number four is written as IV. Because the one is before the five we subtract it making
+four. The same principle applies to the number nine, which is written as IX. There are six instances where
+subtraction is used:
+
+I can be placed before V (5) and X (10) to make 4 and 9. 
+X can be placed before L (50) and C (100) to make 40 and 90. 
+C can be placed before D (500) and M (1000) to make 400 and 900.
+Given an integer, convert it to a roman numeral. Input is guaranteed to be within the range from 1 to 3999.
+
+Example 1:
+Input: 3
+Output: "III"
+
+Example 2:
+Input: 4
+Output: "IV"
+
+Example 3:
+Input: 9
+Output: "IX"
+
+Example 4:
+Input: 58
+Output: "LVIII"
+Explanation: L = 50, V = 5, III = 3.
+
+Example 5:
+Input: 1994
+Output: "MCMXCIV"
+Explanation: M = 1000, CM = 900, XC = 90 and IV = 4.
+"""
+
+class Solution(object):
+    def intToRoman(self, num):
+        """
+        :type num: int
+        :rtype: str
+        """
+        res = []
+        
+        num_map = [
+            (1000, "M"), (900, "CM"), (500, "D"),
+            (400, "CD"), (100, "C"), (90, "XC"),
+            (50, "L"), (40, "XL"), (10, "X"),
+            (9, "IX"), (5, "V"), (4, "IV"),
+            (1, "I")
+        ]
+        
+        for n in num_map:
+            while num - n[0] >= 0:
+                res.append(n[1])
+                num -= n[0]
+        
+        return "".join(res)
+
+
+"""
 357. Count Numbers with Unique Digits
 
 Given a non-negative integer n, count all numbers with unique digits, x, where 0 ≤ x < 10n.
@@ -2908,6 +2982,49 @@ class Solution:
         return lo if abs(arr[lo] - t) <= abs(arr[hi] - t) else hi
 
 """
+209. Minimum Size Subarray Sum
+
+Given an array of n positive integers and a positive integer s, find the minimal length of a contiguous
+subarray of which the sum ≥ s. If there isn't one, return 0 instead.
+
+Example: 
+Input: s = 7, nums = [2,3,1,2,4,3]
+Output: 2
+
+Explanation: the subarray [4,3] has the minimal length under the problem constraint.
+
+Follow up:
+If you have figured out the O(n) solution, try coding another solution of which the time complexity is
+O(n log n). 
+"""
+
+class Solution(object):
+    def minSubArrayLen(self, s, nums):
+        """
+        :type s: int
+        :type nums: List[int]
+        :rtype: int
+        """
+        min_size = sys.maxsize
+        
+        curr = nums[0] if nums else None
+        l, r = 0, 0
+        
+        while r < len(nums):
+            if curr >= s:
+                min_size = min(min_size, r-l+1)
+            
+            if curr <= s:
+                r += 1
+                if r < len(nums):
+                    curr += nums[r]
+            else:
+                curr -= nums[l]
+                l += 1
+        
+        return min_size if min_size != sys.maxsize else 0
+
+"""
 274. H-Index
 
 Given an array of citations (each citation is a non-negative integer) of a researcher, write a function to 
@@ -2969,6 +3086,39 @@ class Solution:
             if total >= i:
                 return i
         return 0
+
+"""
+187. Repeated DNA Sequences
+
+All DNA is composed of a series of nucleotides abbreviated as A, C, G, and T, for example: "ACGAATTCCG". When
+studying DNA, it is sometimes useful to identify repeated sequences within the DNA.
+
+Write a function to find all the 10-letter-long sequences (substrings) that occur more than once in a DNA
+molecule.
+
+Example:
+Input: s = "AAAAACCCCCAAAAACCCCCCAAAAAGGGTTT"
+Output: ["AAAAACCCCC", "CCCCCAAAAA"]
+"""
+
+class Solution(object):
+    def findRepeatedDnaSequences(self, s):
+        """
+        :type s: str
+        :rtype: List[str]
+        """
+        if len(s) < 10:
+            return []
+        
+        counts = collections.defaultdict(int)
+        i, j = 0, 9
+        
+        while j < len(s):
+            counts[s[i:j+1]] += 1
+            i += 1
+            j += 1
+        
+        return [key for key in counts if counts[key] > 1]
 
 """
 228. Summary Ranges

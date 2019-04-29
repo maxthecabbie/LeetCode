@@ -66,5 +66,5 @@ type(x) is list
 type(x) is dict
 
 # INTERVAL OVERLAP
-x1 < y2 and x2 < y1
-x1 <= y2 and x2 <= y1
+x1 < y2 and x2 > y1
+x1 <= y2 and x2 >= y1

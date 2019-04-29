@@ -557,6 +557,46 @@ class Solution:
         return False
 
 """
+221. Maximal Square
+
+Given a 2D binary matrix filled with 0's and 1's, find the largest square containing only 1's and return its
+area.
+
+Example:
+Input: 
+1 0 1 0 0
+1 0 1 1 1
+1 1 1 1 1
+1 0 0 1 0
+Output: 4
+"""
+
+class Solution(object):
+    def maximalSquare(self, matrix):
+        """
+        :type matrix: List[List[str]]
+        :rtype: int
+        """
+        max_side_len = 0
+        
+        if not matrix:
+            return max_side_len
+        
+        m, n = len(matrix), len(matrix[0])
+        cache = [[0 for _ in range(n+1)] for _ in range(m+1)]
+        
+        for i in range(1, len(cache)):
+            for j in range(1, len(cache[0])):
+                if matrix[i-1][j-1] == "1":
+                    cache[i][j] = 1 + min(cache[i][j-1],
+                                          min(cache[i-1][j-1], cache[i-1][j]))
+                    max_side_len = max(max_side_len, cache[i][j])
+        
+        return max_side_len * max_side_len
+        
+        
+
+"""
 55. Jump Game
 
 Given an array of non-negative integers, you are initially positioned at the first index of the array.

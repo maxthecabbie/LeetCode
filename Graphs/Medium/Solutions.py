@@ -192,6 +192,116 @@ class Solution(object):
                 self.dfs(node, graph, vis)
 
 """
+529. Minesweeper
+
+Let's play the minesweeper game (Wikipedia, online game)!
+
+You are given a 2D char matrix representing the game board. 'M' represents an unrevealed mine, 'E' represents
+an unrevealed empty square, 'B' represents a revealed blank square that has no adjacent (above, below, left,
+right, and all 4 diagonals) mines, digit ('1' to '8') represents how many mines are adjacent to this revealed
+square, and finally 'X' represents a revealed mine.
+
+Now given the next click position (row and column indices) among all the unrevealed squares ('M' or 'E'),
+return the board after revealing this position according to the following rules:
+
+1. If a mine ('M') is revealed, then the game is over - change it to 'X'.
+2. If an empty square ('E') with no adjacent mines is revealed, then change it to revealed blank ('B') and all
+of its adjacent unrevealed squares should be revealed recursively.
+3. If an empty square ('E') with at least one adjacent mine is revealed, then change it to a digit ('1' to
+'8') representing the number of adjacent mines.
+4. Return the board when no more squares will be revealed.
+ 
+Example 1:
+Input: 
+[['E', 'E', 'E', 'E', 'E'],
+ ['E', 'E', 'M', 'E', 'E'],
+ ['E', 'E', 'E', 'E', 'E'],
+ ['E', 'E', 'E', 'E', 'E']]
+
+Click : [3,0]
+
+Output: 
+[['B', '1', 'E', '1', 'B'],
+ ['B', '1', 'M', '1', 'B'],
+ ['B', '1', '1', '1', 'B'],
+ ['B', 'B', 'B', 'B', 'B']]
+
+Explanation:
+https://leetcode.com/problems/minesweeper/
+
+Example 2:
+Input: 
+[['B', '1', 'E', '1', 'B'],
+ ['B', '1', 'M', '1', 'B'],
+ ['B', '1', '1', '1', 'B'],
+ ['B', 'B', 'B', 'B', 'B']]
+
+Click : [1,2]
+
+Output: 
+[['B', '1', 'E', '1', 'B'],
+ ['B', '1', 'X', '1', 'B'],
+ ['B', '1', '1', '1', 'B'],
+ ['B', 'B', 'B', 'B', 'B']]
+
+Explanation:
+https://leetcode.com/problems/minesweeper/
+ 
+Note:
+1. The range of the input matrix's height and width is [1,50].
+2. The click position will only be an unrevealed square ('M' or 'E'), which also means the input board
+contains at least one clickable square.
+3. The input board won't be a stage when game is over (some mines have been revealed).
+4. For simplicity, not mentioned rules should be ignored in this problem. For example, you don't need to
+reveal all the unrevealed mines when the game is over, consider any cases that you will win the game or flag
+any squares.
+"""
+
+class Solution(object):
+    def updateBoard(self, board, click):
+        """
+        :type board: List[List[str]]
+        :type click: List[int]
+        :rtype: List[List[str]]
+        """        
+        if board[click[0]][click[1]] == "M":
+            board[click[0]][click[1]] = "X"
+            return board
+        
+        queue = collections.deque([(click[0], click[1])])
+        while queue:
+            i, j = queue.popleft()
+            
+            if 0 <= i < len(board) and 0 <= j < len(board[0]) and\
+            board[i][j] == "E":
+                
+                num_mines = self.get_mines(i, j, board)
+                if num_mines > 0:
+                    board[i][j] = str(num_mines)
+                    continue
+                
+                board[i][j] = "B"
+                for r, c in ((i-1, j-1), (i-1, j), (i-1, j+1),
+                             (i, j-1), (i, j+1),
+                             (i+1, j-1), (i+1, j), (i+1, j+1)):
+                    queue.append((r, c))
+        
+        return board
+    
+    def get_mines(self, i, j, board):
+        num_mines = 0
+        
+        for r, c in ((i-1, j-1), (i-1, j), (i-1, j+1),
+                     (i, j-1), (i, j+1),
+                     (i+1, j-1), (i+1, j), (i+1, j+1)):
+            
+            if 0 <= r < len(board) and 0 <= c < len(board[0]) and\
+            board[r][c] == "M":
+                num_mines += 1
+        
+        return num_mines
+
+"""
 756. Pyramid Transition Matrix
 
 We are stacking blocks to form a pyramid. Each block has a color which is a one letter string, like `'Z'`.
@@ -865,6 +975,76 @@ class Solution:
                 if 0 <= r < len(matrix) and 0 <= c < len(matrix[0]) \
                 and matrix[r][c] >= matrix[i][j] and not ocean[r][c]:
                     q.put((r, c))
+
+"""
+787. Cheapest Flights Within K Stops
+
+There are n cities connected by m flights. Each fight starts from city u and arrives at v with a price w.
+
+Now given all the cities and flights, together with starting city src and the destination dst, your task is
+to find the cheapest price from src to dst with up to k stops. If there is no such route, output -1.
+
+Example 1:
+Input: 
+n = 3, edges = [[0,1,100],[1,2,100],[0,2,500]]
+src = 0, dst = 2, k = 1
+Output: 200
+
+Explanation: 
+The graph looks like this:
+https://leetcode.com/problems/cheapest-flights-within-k-stops/
+
+The cheapest price from city 0 to city 2 with at most 1 stop costs 200, as marked red in the picture.
+
+Example 2:
+Input: 
+n = 3, edges = [[0,1,100],[1,2,100],[0,2,500]]
+src = 0, dst = 2, k = 0
+Output: 500
+
+Explanation: 
+The graph looks like this:
+https://leetcode.com/problems/cheapest-flights-within-k-stops/
+
+The cheapest price from city 0 to city 2 with at most 0 stop costs 500, as marked blue in the picture.
+
+Note:
+1. The number of nodes n will be in range [1, 100], with nodes labeled from 0 to n - 1.
+2. The size of flights will be in range [0, n * (n - 1) / 2].
+3. The format of each flight will be (src, dst, price).
+4. The price of each flight will be in the range [1, 10000].
+5. k is in the range of [0, n - 1].
+6. There will not be any duplicated flights or self cycles.
+"""
+
+class Solution(object):
+    def findCheapestPrice(self, n, flights, src, dst, K):
+        """
+        :type n: int
+        :type flights: List[List[int]]
+        :type src: int
+        :type dst: int
+        :type K: int
+        :rtype: int
+        """
+        min_cost = sys.maxsize
+        
+        graph = collections.defaultdict(list)
+        for u, v, cost in flights:
+            graph[u].append((v, cost))
+        queue = collections.deque([(src, 0, 0)])
+        
+        while queue:
+            node, stops, cost = queue.popleft()
+            if node == dst:
+                min_cost = min(min_cost, cost)
+            
+            if stops <= K:
+                for child, price in graph[node]:
+                    if cost + price < min_cost:
+                        queue.append((child, stops + 1, cost + price))
+        
+        return min_cost if min_cost != sys.maxsize else -1
 
 """
 210. Course Schedule II

@@ -145,6 +145,64 @@ class Solution:
         return count
 
 """
+445. Add Two Numbers II
+
+You are given two non-empty linked lists representing two non-negative integers. The most significant digit
+comes first and each of their nodes contain a single digit. Add the two numbers and return it as a linked list.
+
+You may assume the two numbers do not contain any leading zero, except the number 0 itself.
+
+Follow up:
+What if you cannot modify the input lists? In other words, reversing the lists is not allowed.
+
+Example:
+Input: (7 -> 2 -> 4 -> 3) + (5 -> 6 -> 4)
+Output: 7 -> 8 -> 0 -> 7
+"""
+
+# Definition for singly-linked list.
+# class ListNode(object):
+#     def __init__(self, x):
+#         self.val = x
+#         self.next = None
+class Solution(object):
+    def addTwoNumbers(self, l1, l2):
+        """
+        :type l1: ListNode
+        :type l2: ListNode
+        :rtype: ListNode
+        """
+        
+        s1, s2 = [], []
+        
+        while l1:
+            s1.append(l1)
+            l1 = l1.next
+        
+        while l2:
+            s2.append(l2)
+            l2 = l2.next
+        
+        carry = 0
+        cursor = None
+        
+        while s1 or s2 or carry:
+            val = carry
+            carry = 0
+            
+            val += s1.pop().val if s1 else 0
+            val += s2.pop().val if s2 else 0
+            
+            carry = 1 if val > 9 else 0
+            val %= 10
+            
+            node = ListNode(val)
+            node.next = cursor
+            cursor = node
+        
+        return cursor
+
+"""
 24. Swap Nodes in Pairs
 
 Given a linked list, swap every two adjacent nodes and return its head.
@@ -285,6 +343,147 @@ class Solution:
             
         odd.next = dummy_even.next
         return dummy_odd.next
+
+"""
+725. Split Linked List in Parts
+
+Given a (singly) linked list with head node root, write a function to split the linked list into k
+consecutive linked list "parts".
+
+The length of each part should be as equal as possible: no two parts should have a size differing by more
+than 1. This may lead to some parts being null.
+
+The parts should be in order of occurrence in the input list, and parts occurring earlier should always have
+a size greater than or equal parts occurring later.
+
+Return a List of ListNode's representing the linked list parts that are formed.
+
+Examples 1->2->3->4, k = 5 // 5 equal parts [ [1], [2], [3], [4], null ]
+
+Example 1:
+Input: 
+root = [1, 2, 3], k = 5
+Output: [[1],[2],[3],[],[]]
+
+Explanation:
+The input and each element of the output are ListNodes, not arrays.
+For example, the input root has root.val = 1, root.next.val = 2, \root.next.next.val = 3, and
+root.next.next.next = null.
+The first element output[0] has output[0].val = 1, output[0].next = null.
+The last element output[4] is null, but it's string representation as a ListNode is [].
+
+Example 2:
+Input: 
+root = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], k = 3
+Output: [[1, 2, 3, 4], [5, 6, 7], [8, 9, 10]]
+
+Explanation:
+The input has been split into consecutive parts with size difference at most 1, and earlier parts are a
+larger size than the later parts.
+
+Note:
+1. The length of root will be in the range [0, 1000].
+2. Each value of a node in the input will be an integer in the range [0, 999].
+3. k will be an integer in the range [1, 50].
+"""
+
+# Definition for singly-linked list.
+# class ListNode(object):
+#     def __init__(self, x):
+#         self.val = x
+#         self.next = None
+class Solution(object):
+    def splitListToParts(self, root, k):
+        """
+        :type root: ListNode
+        :type k: int
+        :rtype: List[ListNode]
+        """
+        res = []
+        
+        n = 0
+        cursor = root
+        while cursor:
+            n += 1
+            cursor = cursor.next
+        
+        width = max(n//k, 1)
+        rem = n%k if n > k else 0
+        cursor = root
+        for _ in range(k):
+            curr_head = cursor
+            prev = None
+            num_nodes = width
+            
+            if cursor:
+                if rem > 0:
+                    num_nodes += 1
+                    rem -= 1
+
+                for _ in range(num_nodes):
+                    prev = cursor
+                    cursor = cursor.next
+                
+                prev.next = None
+            
+            res.append(curr_head)
+        
+        return res
+
+"""
+92. Reverse Linked List II
+
+Reverse a linked list from position m to n. Do it in one-pass.
+
+Note: 1 ≤ m ≤ n ≤ length of list.
+
+Example:
+Input: 1->2->3->4->5->NULL, m = 2, n = 4
+Output: 1->4->3->2->5->NULL
+"""
+
+# Definition for singly-linked list.
+# class ListNode(object):
+#     def __init__(self, x):
+#         self.val = x
+#         self.next = None
+class Solution(object):
+    def reverseBetween(self, head, m, n):
+        """
+        :type head: ListNode
+        :type m: int
+        :type n: int
+        :rtype: ListNode
+        """
+        cursor = head
+        prev = None
+        
+        before_m = None
+        node_m = None
+        node_n = None
+        
+        for _ in range(m-1):
+            prev = cursor
+            cursor = cursor.next
+        
+        before_m = prev
+        node_m = cursor
+        
+        for i in range(m, n+1):
+            temp = cursor.next
+            cursor.next = prev
+            prev = cursor
+            cursor = temp
+            
+            if i == n:
+                node_n = prev
+                
+        if before_m:
+            before_m.next = node_n
+        
+        node_m.next = cursor
+        
+        return head if m != 1 else node_n
 
 """
 148. Sort List
